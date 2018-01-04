@@ -1,6 +1,6 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
-import com.payneteasy.grpc.longpolling.client.StreamId;
+import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.client.util.Urls;
 import io.grpc.MethodDescriptor;
 import io.grpc.Status;

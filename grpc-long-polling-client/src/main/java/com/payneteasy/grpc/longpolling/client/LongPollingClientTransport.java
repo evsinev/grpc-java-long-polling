@@ -2,6 +2,8 @@ package com.payneteasy.grpc.longpolling.client;
 
 import com.google.common.util.concurrent.SettableFuture;
 import com.payneteasy.grpc.longpolling.client.http.ITransportHttpService;
+import com.payneteasy.grpc.longpolling.common.StreamId;
+import com.payneteasy.grpc.longpolling.common.TransportId;
 import io.grpc.*;
 import io.grpc.internal.ClientStream;
 import io.grpc.internal.ConnectionClientTransport;

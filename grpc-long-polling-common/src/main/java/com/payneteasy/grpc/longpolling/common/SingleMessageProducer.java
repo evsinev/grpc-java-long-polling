@@ -1,4 +1,4 @@
-package com.payneteasy.grpc.longpolling.client.http;
+package com.payneteasy.grpc.longpolling.common;
 
 import io.grpc.internal.StreamListener;
 import org.slf4j.Logger;
@@ -14,7 +14,6 @@ public class SingleMessageProducer implements StreamListener.MessageProducer {
 
     private InputStream message;
 
-
     public SingleMessageProducer(byte[] aBuffer) {
         this.message = new ByteArrayInputStream(aBuffer);
     }
@@ -26,7 +25,7 @@ public class SingleMessageProducer implements StreamListener.MessageProducer {
     @Nullable
     @Override
     public InputStream next() {
-        LOG.trace("next()");
+        LOG.trace("next() [message = {}]", message);
         InputStream messageToReturn = message;
         message = null;
         return messageToReturn;

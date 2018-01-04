@@ -1,6 +1,6 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
-import com.payneteasy.grpc.longpolling.client.TransportId;
+import com.payneteasy.grpc.longpolling.common.TransportId;
 import io.grpc.Status;
 import io.grpc.internal.ManagedClientTransport;
 import org.slf4j.Logger;

@@ -3,6 +3,7 @@ package com.payneteasy.grpc.longpolling.client;
 import com.payneteasy.grpc.longpolling.client.http.IStreamHttpService;
 import com.payneteasy.grpc.longpolling.client.http.StreamHttpServiceExecutor;
 import com.payneteasy.grpc.longpolling.client.http.StreamHttpServiceUnary;
+import com.payneteasy.grpc.longpolling.common.StreamId;
 import io.grpc.*;
 import io.grpc.internal.ClientStream;
 import io.grpc.internal.ClientStreamListener;

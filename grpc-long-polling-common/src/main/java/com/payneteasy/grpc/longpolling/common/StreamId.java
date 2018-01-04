@@ -1,4 +1,4 @@
-package com.payneteasy.grpc.longpolling.client;
+package com.payneteasy.grpc.longpolling.common;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -34,7 +34,7 @@ public class StreamId {
     @Override
     public String toString() {
         return "StreamId{" +
-                "transportId=" + transportId +
+                "transportId=" + transportId.getTransportId() +
                 ", id='" + id + '\'' +
                 '}';
     }
@@ -44,7 +44,12 @@ public class StreamId {
     }
 
 
-    public String getTransportId() {
-        return transportId.getTransportId();
+    public TransportId getTransportId() {
+        return transportId;
+    }
+
+
+    public static StreamId parse(String aTransportId, String aStreamId) {
+        return new StreamId(TransportId.parse(aTransportId), aStreamId);
     }
 }

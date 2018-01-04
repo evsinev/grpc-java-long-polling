@@ -1,5 +1,6 @@
 package com.payneteasy.grpc.longpolling.client;
 
+import com.payneteasy.grpc.longpolling.common.TransportId;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.internal.AbstractManagedChannelImplBuilder;
 import io.grpc.internal.ClientTransportFactory;

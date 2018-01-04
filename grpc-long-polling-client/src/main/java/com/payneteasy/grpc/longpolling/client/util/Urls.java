@@ -1,6 +1,6 @@
 package com.payneteasy.grpc.longpolling.client.util;
 
-import com.payneteasy.grpc.longpolling.client.StreamId;
+import com.payneteasy.grpc.longpolling.common.StreamId;
 import io.grpc.MethodDescriptor;
 
 import java.net.MalformedURLException;
@@ -26,6 +26,6 @@ public class Urls {
     }
 
     public static URL createStreamUrl(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod) {
-        return appendPaths(aBaseUrl, aMethod.getFullMethodName(), aMethod.getType(), aStreamId.getTransportId(), aStreamId.getStreamId());
+        return appendPaths(aBaseUrl, aMethod.getFullMethodName(), aMethod.getType(), aStreamId.getTransportId().getTransportId(), aStreamId.getStreamId());
     }
 }

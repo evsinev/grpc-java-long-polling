@@ -18,11 +18,6 @@
 
         <dependency>
             <groupId>com.payneteasy.grpc-long-polling</groupId>
-            <artifactId>grpc-long-polling-common</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.payneteasy.grpc-long-polling</groupId>
             <artifactId>grpc-long-polling-client</artifactId>
         </dependency>
 

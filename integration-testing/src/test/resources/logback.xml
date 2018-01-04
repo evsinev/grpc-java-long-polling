@@ -12,7 +12,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.payneteasy" level="debug" />
+    <logger name="com.payneteasy" level="trace" />
 
 
     <root level="info">

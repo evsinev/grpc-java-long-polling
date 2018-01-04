@@ -25,6 +25,7 @@ public class HelloWorldServer {
     public void start() {
         try {
             server.start();
+//            server.dumpStdErr();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

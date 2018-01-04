@@ -4,6 +4,7 @@ import com.payneteasy.grpc.longpolling.client.http.ITransportHttpService;
 import com.payneteasy.grpc.longpolling.client.http.TransportHttpServiceExecutor;
 import com.payneteasy.grpc.longpolling.client.http.TransportHttpServiceNoop;
 import com.payneteasy.grpc.longpolling.client.util.Urls;
+import com.payneteasy.grpc.longpolling.common.TransportId;
 import io.grpc.internal.ClientTransportFactory;
 import io.grpc.internal.ConnectionClientTransport;
 import io.grpc.internal.ProxyParameters;
@@ -20,7 +21,7 @@ public class LongPollingClientTransportFactory implements ClientTransportFactory
     private static final Logger LOG = LoggerFactory.getLogger(LongPollingClientTransportFactory.class);
 
     private final ScheduledExecutorService executorService;
-    private final TransportId              transportId;
+    private final TransportId transportId;
     private final URL                      baseUrl;
 
     public LongPollingClientTransportFactory(ScheduledExecutorService aExecutor, TransportId aId, URL aBaseUrl) {

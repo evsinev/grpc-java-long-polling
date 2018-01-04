@@ -1,4 +1,4 @@
-package com.payneteasy.grpc.longpolling.client;
+package com.payneteasy.grpc.longpolling.common;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -30,5 +30,9 @@ public class TransportId {
 
     public String getTransportId() {
         return id;
+    }
+
+    public static TransportId parse(String aTransportId) {
+        return new TransportId(aTransportId);
     }
 }
