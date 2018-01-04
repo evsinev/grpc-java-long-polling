@@ -1,0 +1,186 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+
+    <artifactId>grpc-long-polling</artifactId>
+    <groupId>com.payneteasy</groupId>
+    <version>1.0-1-SNAPSHOT</version>
+
+    <name>gRPC long polling ${project.version}</name>
+
+    <description>gRPC long polling</description>
+
+    <url>https://github.com/evsinev/grpc-java-long-polling</url>
+
+    <modules>
+        <module>grpc-long-polling-common</module>
+        <module>grpc-long-polling-client</module>
+        <module>grpc-long-polling-server</module>
+        <module>integration-testing</module>
+    </modules>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <logback.version> 1.1.11  </logback.version>
+        <slf4j.version>   1.7.25 </slf4j.version>
+        <grpc.version>    1.8.0  </grpc.version>
+        <jetty.version>9.4.5.v20170502</jetty.version>
+        <spring.version>4.3.9.RELEASE</spring.version>
+
+    </properties>
+
+    <scm>
+        <connection>scm:git:git@github.com/evsinev/grpc-java-long-polling.git</connection>
+        <developerConnection>scm:git:git@github.com/evsinev/grpc-java-long-polling.git</developerConnection>
+        <url>https://github.com/evsinev/grpc-java-long-polling.git</url>
+    </scm>
+
+    <distributionManagement>
+        <site>
+            <id>local-site</id>
+            <name>Store only on local disk</name>
+            <url>file:///tmp/paynet-3-site</url>
+        </site>
+    </distributionManagement>
+
+
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>com.payneteasy.grpc-long-polling</groupId>
+                <artifactId>grpc-long-polling-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.payneteasy.grpc-long-polling</groupId>
+                <artifactId>grpc-long-polling-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.payneteasy.grpc-long-polling</groupId>
+                <artifactId>grpc-long-polling-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.payneteasy</groupId>
+                <artifactId>ber-tlv</artifactId>
+                <version>1.0-8</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-core</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.2</version>
+            </dependency>
+
+            <!-- SLF4J -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-stub</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-testing</artifactId>
+                <version>${grpc.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-protobuf</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>15.0</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>1.4.2</version>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
