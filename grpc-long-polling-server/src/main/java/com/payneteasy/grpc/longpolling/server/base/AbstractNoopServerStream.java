@@ -2,19 +2,34 @@ package com.payneteasy.grpc.longpolling.server.base;
 
 import io.grpc.Attributes;
 import io.grpc.Compressor;
+import io.grpc.Decompressor;
+import io.grpc.Metadata;
 import io.grpc.internal.ServerStream;
+import io.grpc.internal.ServerStreamListener;
 import io.grpc.internal.StatsTraceContext;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletResponse;
 
 public abstract class AbstractNoopServerStream implements ServerStream {
 
-    private final Logger LOG;
+    private  final Logger              LOG;
 
-    public AbstractNoopServerStream(Logger LOG) {
-        LOG.trace("Created");
-        this.LOG = LOG;
+    // writeMessage is executed from [grpc-default-executor-0] thread
+    // request      is executed from [grpc-default-executor-0] thread
+    // setListener  is executed from [qtp681855685-29]         thread (Servlet.doPost)
+    protected volatile ServerStreamListener listener;
+
+    public AbstractNoopServerStream(Logger aLog) {
+        aLog.trace("Created");
+        this.LOG = aLog;
+    }
+
+    @Override
+    public void setListener(ServerStreamListener aListener) {
+        LOG.trace("setListener({})", aListener);
+        listener = aListener;
     }
 
     @Nullable
@@ -54,5 +69,16 @@ public abstract class AbstractNoopServerStream implements ServerStream {
         LOG.trace("getAttributes()");
         return Attributes.EMPTY;
     }
+
+    @Override
+    public void setDecompressor(Decompressor decompressor) {
+        LOG.trace("setDecompressor({})", decompressor);
+    }
+
+    @Override
+    public void flush() {
+        LOG.trace("flush()");
+    }
+
 
 }

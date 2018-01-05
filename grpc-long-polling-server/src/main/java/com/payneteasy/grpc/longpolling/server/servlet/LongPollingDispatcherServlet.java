@@ -3,6 +3,7 @@ package com.payneteasy.grpc.longpolling.server.servlet;
 import com.google.common.base.Preconditions;
 import com.payneteasy.grpc.longpolling.server.LongPollingServerTransport;
 import com.payneteasy.grpc.longpolling.server.servlet.unary.UnaryHandler;
+import com.payneteasy.grpc.longpolling.server.servlet.up.UpServletHandler;
 import io.grpc.internal.ServerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +20,20 @@ public class LongPollingDispatcherServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(LongPollingDispatcherServlet.class);
 
-    private final ServerListener serverListener;
-    private final UnaryHandler unaryServlet;
+    private final ServerListener     serverListener;
+    private final UnaryHandler       unaryServlet;
+    private final UpServletHandler   upServletHandler;
+    private final ITransportRegistry transportRegistry;
 
     private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
 
 
     public LongPollingDispatcherServlet(ServerListener aListener) {
         Preconditions.checkNotNull(aListener, "ServerListener must not be null");
-        serverListener = aListener;
-        unaryServlet = new UnaryHandler(aListener, new LongPollingServerTransport(executor));
+        serverListener    = aListener;
+        unaryServlet      = new UnaryHandler(aListener, new LongPollingServerTransport(executor));
+        transportRegistry = new TransportRegistryImpl(aListener);
+        upServletHandler  = new UpServletHandler(transportRegistry, new LongPollingServerTransport(executor));
     }
 
     @Override
@@ -49,7 +54,12 @@ public class LongPollingDispatcherServlet extends HttpServlet {
                 unaryServlet.handle(aRequest, call, aResponse);
                 break;
 
+            case UP:
+                upServletHandler.handle(aRequest, call, aResponse);
+                break;
+
             default:
+                LOG.error("Method {} not implemented yet", call.getType());
                 aResponse.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         }
 

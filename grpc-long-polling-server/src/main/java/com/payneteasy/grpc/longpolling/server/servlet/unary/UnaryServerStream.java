@@ -26,17 +26,20 @@ public class UnaryServerStream extends AbstractNoopServerStream {
     private final     CountDownLatch        latch;
     private final     StreamId              streamId;
 
-    // writeMessage is executed from [grpc-default-executor-0] thread
-    // request      is executed from [grpc-default-executor-0] thread
-    // setListener  is executed from [qtp681855685-29]         thread (Servlet.doPost)
-    private volatile  ServerStreamListener  listener;
-
     public UnaryServerStream(byte[] aOutputBuffer, HttpServletResponse aResponse, StreamId aStreamId) {
         super(LOG);
         outputBuffer = aOutputBuffer;
         response     = aResponse;
         latch        = new CountDownLatch(1);
         streamId     = aStreamId;
+    }
+
+    @Override
+    public void writeHeaders(Metadata headers) {
+        LOG.trace("writeHeaders({})", headers);
+        for (String key : headers.keys()) {
+            response.addHeader(key, headers.get(Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER)));
+        }
     }
 
     @Override
@@ -55,14 +58,6 @@ public class UnaryServerStream extends AbstractNoopServerStream {
     }
 
     @Override
-    public void writeHeaders(Metadata headers) {
-        LOG.trace("writeHeaders({})", headers);
-        for (String key : headers.keys()) {
-            response.addHeader(key, headers.get(Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER)));
-        }
-    }
-
-    @Override
     public void close(Status status, Metadata trailers) {
         LOG.trace("close({}, {})", status, trailers);
     }
@@ -73,28 +68,12 @@ public class UnaryServerStream extends AbstractNoopServerStream {
     }
 
     @Override
-    public void setListener(ServerStreamListener aListener) {
-        LOG.trace("setListener({})", aListener);
-        listener = aListener;
-    }
-
-    @Override
-    public void setDecompressor(Decompressor decompressor) {
-        LOG.trace("setDecompressor({})", decompressor);
-    }
-
-    @Override
     public void request(int numMessages) {
         LOG.trace("request({})", numMessages);
         LOG.debug("Sending messagesAvailable ...");
         listener.messagesAvailable(new SingleMessageProducer(getClass().getSimpleName(), outputBuffer));
         LOG.debug("Stream {} half closed", streamId);
         listener.halfClosed();
-    }
-
-    @Override
-    public void flush() {
-        LOG.trace("flush()");
     }
 
     public void waitDone(int aPeriod, TimeUnit aTimeUnit) throws InterruptedException {

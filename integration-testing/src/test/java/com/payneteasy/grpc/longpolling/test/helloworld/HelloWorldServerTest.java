@@ -1,10 +1,9 @@
 package com.payneteasy.grpc.longpolling.test.helloworld;
 
 import com.payneteasy.grpc.longpolling.server.LongPollingServer;
-import com.payneteasy.grpc.longpolling.server.LongPollingServerBuilder;
 import com.payneteasy.grpc.longpolling.server.servlet.LongPollingDispatcherServlet;
+import com.payneteasy.grpc.longpolling.test.util.ServerUtils;
 import com.payneteasy.tlv.HexUtil;
-import io.grpc.Server;
 import io.grpc.internal.IoUtils;
 import io.grpc.internal.ServerListener;
 import org.junit.Assert;
@@ -23,15 +22,8 @@ public class HelloWorldServerTest {
     @Test(timeout = 10_000)
     public void test() throws IOException, InterruptedException {
 
-        LongPollingServer pollingServer = new LongPollingServer();
-
-        Server grpcServer = LongPollingServerBuilder.forPort(-1)
-                .longPollingServer(pollingServer)
-                .addService(new GreeterImpl())
-                .build();
-        grpcServer.start();
-
-        ServerListener serverListener = pollingServer.waitForServerListener();
+        LongPollingServer pollingServer = ServerUtils.createLongPollingServer(new GreeterImpl());
+        ServerListener   serverListener = pollingServer.waitForServerListener();
 
         HelloWorldServer server = new HelloWorldServer(9096, new LongPollingDispatcherServlet(serverListener));
         server.start();
