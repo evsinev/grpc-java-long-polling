@@ -195,7 +195,7 @@
                         <format>html</format>
                         <format>xml</format>
                     </formats>
-                    <aggregate>false</aggregate>
+                    <aggregate>true</aggregate>
                     <check />
                 </configuration>
             </plugin>
