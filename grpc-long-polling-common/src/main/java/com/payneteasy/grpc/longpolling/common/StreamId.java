@@ -28,10 +28,7 @@ public class StreamId {
 
     @Override
     public String toString() {
-        return "StreamId{" +
-                "transportId=" + transportId.getTransportId() +
-                ", id='" + id + '\'' +
-                '}';
+        return "SID:" + transportId.getTransportId() + "/" + id;
     }
 
     public String getStreamId() {

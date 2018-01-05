@@ -1,34 +1,42 @@
 package com.payneteasy.grpc.longpolling.server.servlet.unary;
 
 import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
-import io.grpc.*;
+import com.payneteasy.grpc.longpolling.common.StreamId;
+import com.payneteasy.grpc.longpolling.server.base.AbstractNoopServerStream;
+import io.grpc.Decompressor;
+import io.grpc.Metadata;
+import io.grpc.Status;
 import io.grpc.internal.IoUtils;
-import io.grpc.internal.ServerStream;
 import io.grpc.internal.ServerStreamListener;
-import io.grpc.internal.StatsTraceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class UnaryServerStream implements ServerStream {
+public class UnaryServerStream extends AbstractNoopServerStream {
 
     private static final Logger LOG = LoggerFactory.getLogger(UnaryServerStream.class);
 
-    private final byte[] outputBuffer;
+    private final     byte[]                outputBuffer;
+    private final     HttpServletResponse   response;
+    private final     CountDownLatch        latch;
+    private final     StreamId              streamId;
 
-    private final HttpServletResponse response;
-    private volatile  ServerStreamListener listener;
-    private final CountDownLatch latch  = new CountDownLatch(1);
+    // writeMessage is executed from [grpc-default-executor-0] thread
+    // request      is executed from [grpc-default-executor-0] thread
+    // setListener  is executed from [qtp681855685-29]         thread (Servlet.doPost)
+    private volatile  ServerStreamListener  listener;
 
-    public UnaryServerStream(byte[] aOutputBuffer, HttpServletResponse aResponse) {
+    public UnaryServerStream(byte[] aOutputBuffer, HttpServletResponse aResponse, StreamId aStreamId) {
+        super(LOG);
         outputBuffer = aOutputBuffer;
-        response = aResponse;
+        response     = aResponse;
+        latch        = new CountDownLatch(1);
+        streamId     = aStreamId;
     }
 
     @Override
@@ -76,54 +84,17 @@ public class UnaryServerStream implements ServerStream {
     }
 
     @Override
-    public Attributes getAttributes() {
-        LOG.trace("getAttributes()");
-        return Attributes.EMPTY;
-    }
-
-    @Nullable
-    @Override
-    public String getAuthority() {
-        LOG.trace("getAttributes()");
-        return null;
-    }
-
-
-    @Override
-    public StatsTraceContext statsTraceContext() {
-        LOG.trace("statsTraceContext()");
-        return StatsTraceContext.NOOP;
-    }
-
-    @Override
     public void request(int numMessages) {
         LOG.trace("request({})", numMessages);
         LOG.debug("Sending messagesAvailable ...");
         listener.messagesAvailable(new SingleMessageProducer(getClass().getSimpleName(), outputBuffer));
+        LOG.debug("Stream {} half closed", streamId);
         listener.halfClosed();
     }
 
     @Override
     public void flush() {
         LOG.trace("flush()");
-    }
-
-    @Override
-    public boolean isReady() {
-        LOG.trace("isReady()");
-        return true;
-    }
-
-    @Override
-    public void setCompressor(Compressor compressor) {
-        LOG.trace("setCompressor({})", compressor);
-
-    }
-
-    @Override
-    public void setMessageCompression(boolean enable) {
-        LOG.trace("setMessageCompression({})", enable);
-
     }
 
     public void waitDone(int aPeriod, TimeUnit aTimeUnit) throws InterruptedException {

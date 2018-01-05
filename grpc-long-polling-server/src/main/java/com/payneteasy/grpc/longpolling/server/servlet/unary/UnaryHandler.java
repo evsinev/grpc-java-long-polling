@@ -28,18 +28,21 @@ public class UnaryHandler {
     }
 
     public void handle(HttpServletRequest aRequest, MethodCall aMethod, HttpServletResponse aResponse) throws IOException {
+        LOG.debug("Creating unary transport and stream: {}", aMethod.getStreamId());
         ServerTransportListener listener = this.listener.transportCreated(serverTransport);
+
         byte[] buffer = IoUtils.toByteArray(aRequest.getInputStream());
-        UnaryServerStream stream = new UnaryServerStream(buffer, aResponse);
+        UnaryServerStream stream = new UnaryServerStream(buffer, aResponse, aMethod.getStreamId());
         listener.streamCreated(stream, aMethod.getMethod(), new Metadata());
         listener.transportReady(Attributes.EMPTY);
 
         try {
+            LOG.debug("Waiting while sending response to servlet output ...");
             stream.waitDone(1, TimeUnit.MINUTES);
         } catch (InterruptedException e) {
             LOG.error("Cannot wait 1 min", e);
         }
-
         listener.transportTerminated();
+        LOG.debug("Transport {} terminated", aMethod.getStreamId().getTransportId());
     }
 }

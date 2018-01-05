@@ -40,4 +40,9 @@ public class TransportId {
     public StreamId generateNextStreamId() {
         return new StreamId(this, streamIds.incrementAndGet()+"");
     }
+
+    @Override
+    public String toString() {
+        return "TID:" + id;
+    }
 }
