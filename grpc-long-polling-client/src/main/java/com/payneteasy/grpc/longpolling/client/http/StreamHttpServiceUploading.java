@@ -36,27 +36,13 @@ public class StreamHttpServiceUploading implements IStreamHttpService {
         try {
             LOG.debug("Sending to {} ...", sendUrl);
 
-            HttpURLConnection connection = (HttpURLConnection) sendUrl.openConnection();
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-
-            if(aInputStream instanceof Drainable && !LOG.isDebugEnabled()) {
-                ((Drainable) aInputStream).drainTo(connection.getOutputStream());
-            } else {
-                byte[] outputBytes = IoUtils.toByteArray(aInputStream);
-                LOG.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
-                connection.getOutputStream().write(outputBytes);
-            }
-
-            int status = connection.getResponseCode();
-            if(status != 200) {
-                fireError(Status.ABORTED, new IOException(connection.getResponseMessage()), "Invalid status code " + status);
+            HttpURLConnection connection = createBidirectionalConnection();
+            sendMessage(aInputStream, connection);
+            if (hasError(connection)) {
                 return;
             }
-            try(InputStream in = connection.getInputStream()) {
-                byte[] bytes = IoUtils.toByteArray(in);
-                LOG.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
-            }
+            readOutputFromServer(connection);
+
         } catch (FileNotFoundException e) {
             fireError(Status.NOT_FOUND, e, "Not found");
         } catch (ConnectException e) {
@@ -64,7 +50,39 @@ public class StreamHttpServiceUploading implements IStreamHttpService {
         } catch (IOException e) {
             fireError(Status.DATA_LOSS, e, "IO error");
         }
+    }
 
+    private boolean hasError(HttpURLConnection connection) throws IOException {
+        int status = connection.getResponseCode();
+        if(status != 200) {
+            fireError(Status.ABORTED, new IOException(connection.getResponseMessage()), "Invalid status code " + status);
+            return true;
+        }
+        return false;
+    }
+
+    private HttpURLConnection createBidirectionalConnection() throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) sendUrl.openConnection();
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        return connection;
+    }
+
+    private void readOutputFromServer(HttpURLConnection connection) throws IOException {
+        try(InputStream in = connection.getInputStream()) {
+            byte[] bytes = IoUtils.toByteArray(in);
+            LOG.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
+        }
+    }
+
+    private void sendMessage(InputStream aInputStream, HttpURLConnection connection) throws IOException {
+        if(aInputStream instanceof Drainable && !LOG.isDebugEnabled()) {
+            ((Drainable) aInputStream).drainTo(connection.getOutputStream());
+        } else {
+            byte[] outputBytes = IoUtils.toByteArray(aInputStream);
+            LOG.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
+            connection.getOutputStream().write(outputBytes);
+        }
     }
 
     private void fireError(Status aStatus, Exception aException, String aReason) {
