@@ -8,7 +8,7 @@ cache:
   directories:
   - $HOME/.m2
 
-script: "mvn cobertura:cobertura-integration-test"
+script: "mvn test"
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
