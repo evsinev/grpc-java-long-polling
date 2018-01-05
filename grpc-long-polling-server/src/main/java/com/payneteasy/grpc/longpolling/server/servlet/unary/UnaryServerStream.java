@@ -99,7 +99,7 @@ public class UnaryServerStream implements ServerStream {
     public void request(int numMessages) {
         LOG.trace("request({})", numMessages);
         LOG.debug("Sending messagesAvailable ...");
-        listener.messagesAvailable(new SingleMessageProducer(outputBuffer));
+        listener.messagesAvailable(new SingleMessageProducer(getClass().getSimpleName(), outputBuffer));
         listener.halfClosed();
     }
 

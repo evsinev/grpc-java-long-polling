@@ -1,5 +1,6 @@
 package com.payneteasy.grpc.longpolling.client.util;
 
+import com.payneteasy.grpc.longpolling.common.MethodDirection;
 import com.payneteasy.grpc.longpolling.common.StreamId;
 import io.grpc.MethodDescriptor;
 
@@ -25,7 +26,7 @@ public class Urls {
         }
     }
 
-    public static URL createStreamUrl(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod) {
-        return appendPaths(aBaseUrl, aMethod.getFullMethodName(), aMethod.getType(), aStreamId.getTransportId().getTransportId(), aStreamId.getStreamId());
+    public static URL createStreamUrl(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod, MethodDirection aMethodDirection) {
+        return appendPaths(aBaseUrl, aMethod.getFullMethodName(), aMethodDirection, aStreamId.getTransportId().getTransportId(), aStreamId.getStreamId());
     }
 }

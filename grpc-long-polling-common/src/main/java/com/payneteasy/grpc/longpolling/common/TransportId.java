@@ -1,10 +1,11 @@
 package com.payneteasy.grpc.longpolling.common;
 
 import java.util.Objects;
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class TransportId {
 
+    private final AtomicLong streamIds = new AtomicLong(0);
     private final String id;
 
     private TransportId(String id) {
@@ -25,7 +26,7 @@ public class TransportId {
     }
 
     public static TransportId generateNew() {
-        return new TransportId(UUID.randomUUID().toString());
+        return new TransportId(Uuids.generateUuid());
     }
 
     public String getTransportId() {
@@ -34,5 +35,9 @@ public class TransportId {
 
     public static TransportId parse(String aTransportId) {
         return new TransportId(aTransportId);
+    }
+
+    public StreamId generateNextStreamId() {
+        return new StreamId(this, streamIds.incrementAndGet()+"");
     }
 }

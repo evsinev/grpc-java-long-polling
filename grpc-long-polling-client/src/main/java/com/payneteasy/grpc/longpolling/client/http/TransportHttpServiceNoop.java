@@ -24,8 +24,6 @@ public class TransportHttpServiceNoop implements ITransportHttpService {
     @Override
     public void sendOpenTransport(ManagedClientTransport.Listener aListener) {
         LOG.trace("sendOpenTransportClose({})", aListener);
-        aListener.transportInUse(true);
-        aListener.transportInUse(false);
         aListener.transportReady();
     }
 

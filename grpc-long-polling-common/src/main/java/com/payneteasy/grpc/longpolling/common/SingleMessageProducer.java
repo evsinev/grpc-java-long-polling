@@ -12,20 +12,22 @@ public class SingleMessageProducer implements StreamListener.MessageProducer {
 
     private static final Logger LOG = LoggerFactory.getLogger(SingleMessageProducer.class);
 
-    private InputStream message;
+    private       InputStream message;
+    private final String      messageSource;
 
-    public SingleMessageProducer(byte[] aBuffer) {
+    public SingleMessageProducer(String aSource, byte[] aBuffer) {
         this.message = new ByteArrayInputStream(aBuffer);
+        messageSource = aSource;
     }
 
-    public SingleMessageProducer(InputStream message) {
-        this.message = message;
-    }
+//    public SingleMessageProducer(InputStream message) {
+//        this.message = message;
+//    }
 
     @Nullable
     @Override
     public InputStream next() {
-        LOG.trace("next() [message = {}]", message);
+        LOG.trace("{}: next() [message = {}]", messageSource, message != null ? message : "no message");
         InputStream messageToReturn = message;
         message = null;
         return messageToReturn;

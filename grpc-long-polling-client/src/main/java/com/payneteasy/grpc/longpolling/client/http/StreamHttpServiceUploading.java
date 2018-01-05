@@ -1,11 +1,13 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
-import com.payneteasy.grpc.longpolling.common.MethodDirection;
-import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
-import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.client.util.Urls;
+import com.payneteasy.grpc.longpolling.common.MethodDirection;
+import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.tlv.HexUtil;
-import io.grpc.*;
+import io.grpc.Drainable;
+import io.grpc.Metadata;
+import io.grpc.MethodDescriptor;
+import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
 import io.grpc.internal.IoUtils;
 import org.slf4j.Logger;
@@ -18,15 +20,15 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class StreamHttpServiceUnary implements IStreamHttpService {
+public class StreamHttpServiceUploading implements IStreamHttpService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StreamHttpServiceUnary.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamHttpServiceUploading.class);
 
     private final    URL                  sendUrl;
     private volatile ClientStreamListener listener;
 
-    public StreamHttpServiceUnary(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod) {
-        sendUrl = Urls.createStreamUrl(aBaseUrl, aStreamId, aMethod, MethodDirection.UNARY);
+    public StreamHttpServiceUploading(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod) {
+        sendUrl = Urls.createStreamUrl(aBaseUrl, aStreamId, aMethod, MethodDirection.UP);
     }
 
     @Override
@@ -54,8 +56,6 @@ public class StreamHttpServiceUnary implements IStreamHttpService {
             try(InputStream in = connection.getInputStream()) {
                 byte[] bytes = IoUtils.toByteArray(in);
                 LOG.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
-                listener.messagesAvailable(new SingleMessageProducer(getClass().getSimpleName(), bytes));
-                listener.closed(Status.OK, new Metadata());
             }
         } catch (FileNotFoundException e) {
             fireError(Status.NOT_FOUND, e, "Not found");

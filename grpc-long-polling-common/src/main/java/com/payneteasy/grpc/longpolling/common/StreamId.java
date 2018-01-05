@@ -1,20 +1,15 @@
 package com.payneteasy.grpc.longpolling.common;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class StreamId {
 
     private final TransportId transportId;
     private final String id;
 
-    public static StreamId generateNew(TransportId aTransportId) {
-        return new StreamId(aTransportId, UUID.randomUUID().toString());
-    }
-
-    private StreamId(TransportId transportId, String id) {
+    StreamId(TransportId transportId, String aStreamId) {
         this.transportId = transportId;
-        this.id = id;
+        this.id = aStreamId;
     }
 
     @Override

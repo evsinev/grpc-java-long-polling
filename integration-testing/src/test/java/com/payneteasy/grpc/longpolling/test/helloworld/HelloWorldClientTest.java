@@ -28,7 +28,6 @@ public class HelloWorldClientTest {
             @Override
             protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
                 resp.getOutputStream().write(HexUtil.parseHex("0a06 7465 7374 2032"));
-
             }
         };
 
