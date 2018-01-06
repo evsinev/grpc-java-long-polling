@@ -38,6 +38,8 @@ public class StreamIdTest {
         assertFalse(STREAM.equals("hello"));
         //noinspection EqualsWithItself
         assertTrue(STREAM.equals(STREAM));
+        //noinspection ObjectEqualsNull
+        assertFalse(STREAM.equals(null));
     }
 
     @Test
