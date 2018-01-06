@@ -1,1 +1,1 @@
-com.payneteasy.grpc.websocket.server.WebSocketServerProvider
+com.payneteasy.grpc.longpolling.server.LongPollingServerProvider

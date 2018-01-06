@@ -16,6 +16,6 @@ public class LongPollingServerProvider extends ServerProvider {
 
     @Override
     protected ServerBuilder<?> builderForPort(int port) {
-        return null;
+        return new LongPollingServerBuilder();
     }
 }
