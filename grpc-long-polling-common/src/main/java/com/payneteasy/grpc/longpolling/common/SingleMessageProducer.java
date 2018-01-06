@@ -1,11 +1,13 @@
 package com.payneteasy.grpc.longpolling.common;
 
+import io.grpc.internal.IoUtils;
 import io.grpc.internal.StreamListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 public class SingleMessageProducer implements StreamListener.MessageProducer {
@@ -22,10 +24,6 @@ public class SingleMessageProducer implements StreamListener.MessageProducer {
         size = aBuffer.length;
     }
 
-//    public SingleMessageProducer(InputStream message) {
-//        this.message = message;
-//    }
-
     @Nullable
     @Override
     public InputStream next() {
@@ -40,5 +38,10 @@ public class SingleMessageProducer implements StreamListener.MessageProducer {
         return "SingleMessageProducer{" +
                 "source=" + messageSource + ", siez=" + size +
                 '}';
+    }
+
+    public static SingleMessageProducer readFully(Class<?> aClass, InputStream aInputStream) throws IOException {
+        byte[] buffer = IoUtils.toByteArray(aInputStream);
+        return new SingleMessageProducer(aClass.getSimpleName(), buffer);
     }
 }

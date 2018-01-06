@@ -1,17 +1,19 @@
 package com.payneteasy.grpc.longpolling.server.servlet;
 
+import com.payneteasy.grpc.longpolling.common.MessagesContainer;
 import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.common.TransportId;
-import com.payneteasy.grpc.longpolling.server.LongPollingServerTransport;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public interface ITransportRegistry {
 
-    TransportHolder getOrCreateTransportListener(TransportId transportId, LongPollingServerTransport aServerTransport);
+    TransportHolder getOrCreateTransportListener(TransportId transportId);
 
     void removeTransport(TransportId aTransportId);
 
     void enqueueMessage(StreamId aStreamId, InputStream aMessage);
 
+    MessagesContainer getReadyMessages(StreamId aStreamId, String method) throws InterruptedException, IOException;
 }

@@ -18,13 +18,16 @@ import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 public class StreamingServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingServerTest.class);
 
 
     @Test(timeout = 10_000)
-    public void test() throws IOException, InterruptedException {
+    public void up() throws IOException, InterruptedException {
         CountDownLatch latch = new CountDownLatch(3);
         LongPollingServer longPollingServer = ServerUtils.createLongPollingServer(new StreamingGreeterImpl(latch));
         ServerListener    serverListener    = longPollingServer.waitForServerListener();
@@ -41,23 +44,63 @@ public class StreamingServerTest {
 
         jettyServer.shutdown();
         longPollingServer.shutdown();
-
-//        byte[] buf = send();
-//        LOG.debug("returned = {}", new String(buf, 2, buf.length - 2));
-//        Assert.assertEquals("[13] :  0A 0B 48 65  6C 6C 6F 20  68 65 6C 6C  6F", HexUtil.toFormattedHexString(buf));
-
     }
 
-    private void send(String aMethodDirection, String aHex) throws IOException {
+    @Test(timeout = 10_000)
+    public void upDown() throws IOException, InterruptedException {
+        CountDownLatch latch = new CountDownLatch(3);
+        LongPollingServer longPollingServer = ServerUtils.createLongPollingServer(new StreamingGreeterImpl(latch));
+        ServerListener    serverListener    = longPollingServer.waitForServerListener();
+        HelloWorldServer  jettyServer       = new HelloWorldServer(9096, new LongPollingDispatcherServlet(serverListener));
+
+        jettyServer.start();
+
+        send("UP", "0A 06 74 65  73 74 20 31");
+        assertEquals("[23] :  02 " + // version
+                "00 00 00  07 " +             // length 1
+                "0A 05 68  65 6C 6C 6F  " +   // data   1
+                "00 00 00 07  " +             // length 2
+                "0A 05 68 65  6C 6C 6F"       // data   2
+                , send("DOWN", "0A 06 74 65  73 74 20 32"));
+        
+
+        jettyServer.shutdown();
+        longPollingServer.shutdown();
+    }
+
+    @Test(timeout = 10_000)
+    public void down() throws IOException, InterruptedException {
+        CountDownLatch latch = new CountDownLatch(3);
+        LongPollingServer longPollingServer = ServerUtils.createLongPollingServer(new StreamingGreeterImpl(latch));
+        ServerListener    serverListener    = longPollingServer.waitForServerListener();
+        HelloWorldServer  jettyServer       = new HelloWorldServer(9096, new LongPollingDispatcherServlet(serverListener));
+
+        jettyServer.start();
+
+        String response = send("DOWN", "0A 06 74 65  73 74 20 32");
+        
+        if(!response.equals("[23] :  02 00 00 00  07 0A 05 68  65 6C 6C 6F  00 00 00 07  0A 05 68 65  6C 6C 6F")
+                && !response.equals("[8] :  01 0A 05 68  65 6C 6C 6F")) {
+            fail("Response is wrong: " + response);
+        }
+
+
+        jettyServer.shutdown();
+        longPollingServer.shutdown();
+    }
+
+    private String send(String aMethodDirection, String aHex) throws IOException {
         String urlText = String.format("http://localhost:9096/test/manualflowcontrol.StreamingGreeter/SayHelloStreaming/%s/801VJ7k2ThCAjUUF7lKlDw/1", aMethodDirection);
         URL url = new URL(urlText);
         LOG.info("Sending to {} ...", url);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoInput(true);
         connection.setDoOutput(true);
-        connection.getOutputStream().write(HexUtil.parseHex("0A 05 68 65  6C 6C 6F"));
+        connection.getOutputStream().write(HexUtil.parseHex(aHex));
         byte[] out =  IoUtils.toByteArray(connection.getInputStream());
-        LOG.debug("out: {}", HexUtil.toFormattedHexString(out));
+        String hex = HexUtil.toFormattedHexString(out);
+        LOG.debug("out: {}", hex);
+        return hex;
     }
 
 

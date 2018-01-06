@@ -1,5 +1,6 @@
 package com.payneteasy.grpc.longpolling.server.servlet;
 
+import com.payneteasy.grpc.longpolling.common.MessagesContainer;
 import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.server.servlet.up.UpServerStream;
 import io.grpc.Attributes;
@@ -8,10 +9,12 @@ import io.grpc.internal.ServerTransportListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class TransportHolder {
 
@@ -45,5 +48,19 @@ public class TransportHolder {
             listener.transportReady(Attributes.EMPTY);
             return stream;
         });
+    }
+
+    public MessagesContainer getMessages(long aTimeToWait) throws InterruptedException, IOException {
+        MessagesContainer.Builder builder = new MessagesContainer.Builder();
+        // waiting for any message
+        InputStream inputStream = messages.poll(aTimeToWait, TimeUnit.MILLISECONDS);
+        if(inputStream != null) {
+            builder.add(inputStream);
+            // retrieves the rest of the queue
+            while ( (inputStream = messages.poll()) != null) {
+                builder.add(inputStream);
+            }
+        }
+        return builder.build();
     }
 }

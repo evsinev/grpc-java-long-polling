@@ -4,6 +4,7 @@ import com.payneteasy.grpc.longpolling.client.util.Urls;
 import com.payneteasy.grpc.longpolling.common.MethodDirection;
 import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
 import com.payneteasy.grpc.longpolling.common.StreamId;
+import com.payneteasy.grpc.longpolling.common.Streams;
 import com.payneteasy.tlv.HexUtil;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
@@ -25,10 +26,11 @@ public class StreamHttpServiceDownloading implements IStreamHttpService {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamHttpServiceDownloading.class);
 
-    private final    URL                  sendUrl;
     private volatile ClientStreamListener listener;
     private volatile boolean              active = true;
     private final    AtomicBoolean        transportActive;
+    private final    URL                  sendUrl;
+    private final    Streams              streams = new Streams(LOG);
 
     public StreamHttpServiceDownloading(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod, AtomicBoolean aTransportActive) {
         sendUrl = Urls.createStreamUrl(aBaseUrl, aStreamId, aMethod, MethodDirection.DOWN);
@@ -49,11 +51,9 @@ public class StreamHttpServiceDownloading implements IStreamHttpService {
                     fireError(Status.ABORTED, new IOException(connection.getResponseMessage()), "Invalid status code " + status);
                     return;
                 }
-                try(InputStream in = connection.getInputStream()) {
-                    byte[] bytes = IoUtils.toByteArray(in);
-                    LOG.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
-                    listener.messagesAvailable(new SingleMessageProducer(getClass().getSimpleName(), bytes));
-                }
+
+                streams.messageAvailable(listener, connection.getInputStream());
+
             } catch (FileNotFoundException e) {
                 fireError(Status.NOT_FOUND, e, "Not found");
             } catch (ConnectException e) {

@@ -3,8 +3,8 @@ package com.payneteasy.grpc.longpolling.client.http;
 import com.payneteasy.grpc.longpolling.client.util.Urls;
 import com.payneteasy.grpc.longpolling.common.MethodDirection;
 import com.payneteasy.grpc.longpolling.common.StreamId;
+import com.payneteasy.grpc.longpolling.common.Streams;
 import com.payneteasy.tlv.HexUtil;
-import io.grpc.Drainable;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
 import io.grpc.Status;
@@ -24,8 +24,9 @@ public class StreamHttpServiceUploading implements IStreamHttpService {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamHttpServiceUploading.class);
 
-    private final    URL                  sendUrl;
     private volatile ClientStreamListener listener;
+    private final    URL                  sendUrl;
+    private final    Streams              streams = new Streams(LOG);
 
     public StreamHttpServiceUploading(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod) {
         sendUrl = Urls.createStreamUrl(aBaseUrl, aStreamId, aMethod, MethodDirection.UP);
@@ -37,7 +38,7 @@ public class StreamHttpServiceUploading implements IStreamHttpService {
             LOG.debug("Sending to {} ...", sendUrl);
 
             HttpURLConnection connection = createBidirectionalConnection();
-            sendMessage(aInputStream, connection);
+            streams.sendMessage(aInputStream, connection);
             if (hasError(connection)) {
                 return;
             }
@@ -72,16 +73,6 @@ public class StreamHttpServiceUploading implements IStreamHttpService {
         try(InputStream in = connection.getInputStream()) {
             byte[] bytes = IoUtils.toByteArray(in);
             LOG.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
-        }
-    }
-
-    private void sendMessage(InputStream aInputStream, HttpURLConnection connection) throws IOException {
-        if(aInputStream instanceof Drainable && !LOG.isDebugEnabled()) {
-            ((Drainable) aInputStream).drainTo(connection.getOutputStream());
-        } else {
-            byte[] outputBytes = IoUtils.toByteArray(aInputStream);
-            LOG.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
-            connection.getOutputStream().write(outputBytes);
         }
     }
 

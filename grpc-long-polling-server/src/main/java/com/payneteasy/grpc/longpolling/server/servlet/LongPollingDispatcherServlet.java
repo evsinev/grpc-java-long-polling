@@ -2,6 +2,7 @@ package com.payneteasy.grpc.longpolling.server.servlet;
 
 import com.google.common.base.Preconditions;
 import com.payneteasy.grpc.longpolling.server.LongPollingServerTransport;
+import com.payneteasy.grpc.longpolling.server.servlet.down.DownServletHandler;
 import com.payneteasy.grpc.longpolling.server.servlet.unary.UnaryHandler;
 import com.payneteasy.grpc.longpolling.server.servlet.up.UpServletHandler;
 import io.grpc.internal.ServerListener;
@@ -23,17 +24,20 @@ public class LongPollingDispatcherServlet extends HttpServlet {
     private final ServerListener     serverListener;
     private final UnaryHandler       unaryServlet;
     private final UpServletHandler   upServletHandler;
-    private final ITransportRegistry transportRegistry;
+    private final DownServletHandler downServletHandler;
 
     private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
 
 
     public LongPollingDispatcherServlet(ServerListener aListener) {
         Preconditions.checkNotNull(aListener, "ServerListener must not be null");
-        serverListener    = aListener;
-        unaryServlet      = new UnaryHandler(aListener, new LongPollingServerTransport(executor));
-        transportRegistry = new TransportRegistryImpl(aListener);
-        upServletHandler  = new UpServletHandler(transportRegistry, new LongPollingServerTransport(executor));
+        LongPollingServerTransport serverTransport   = new LongPollingServerTransport(executor);
+        ITransportRegistry         transportRegistry = new TransportRegistryImpl(aListener, serverTransport);
+
+        serverListener     = aListener;
+        unaryServlet       = new UnaryHandler(aListener, serverTransport);
+        upServletHandler   = new UpServletHandler(transportRegistry);
+        downServletHandler = new DownServletHandler(transportRegistry);
     }
 
     @Override
@@ -47,7 +51,7 @@ public class LongPollingDispatcherServlet extends HttpServlet {
             return;
         }
 
-        LOG.debug("Method call: {}", call);
+        LOG.debug("Calling {} ...", call);
 
         switch (call.getType()) {
             case UNARY:
@@ -55,7 +59,11 @@ public class LongPollingDispatcherServlet extends HttpServlet {
                 break;
 
             case UP:
-                upServletHandler.handle(aRequest, call, aResponse);
+                upServletHandler.handle(aRequest, call);
+                break;
+
+            case DOWN:
+                downServletHandler.handle(call, aRequest, aResponse);
                 break;
 
             default:

@@ -3,10 +3,14 @@ package com.payneteasy.grpc.longpolling.test.helloworld;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
 
 public class HelloWorldServer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(HelloWorldServer.class);
 
 
     private final Server server;
@@ -32,6 +36,7 @@ public class HelloWorldServer {
     }
 
     public void shutdown() {
+        LOG.debug("Shutdown");
         try {
             server.stop();
         } catch (Exception e) {

@@ -1,13 +1,13 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
-import com.payneteasy.grpc.longpolling.common.MethodDirection;
-import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
-import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.client.util.Urls;
-import com.payneteasy.tlv.HexUtil;
-import io.grpc.*;
+import com.payneteasy.grpc.longpolling.common.MethodDirection;
+import com.payneteasy.grpc.longpolling.common.StreamId;
+import com.payneteasy.grpc.longpolling.common.Streams;
+import io.grpc.Metadata;
+import io.grpc.MethodDescriptor;
+import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
-import io.grpc.internal.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +22,9 @@ public class StreamHttpServiceUnary implements IStreamHttpService {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamHttpServiceUnary.class);
 
-    private final    URL                  sendUrl;
     private volatile ClientStreamListener listener;
+    private final    URL                  sendUrl;
+    private final    Streams              streams = new Streams(LOG);
 
     public StreamHttpServiceUnary(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod) {
         sendUrl = Urls.createStreamUrl(aBaseUrl, aStreamId, aMethod, MethodDirection.UNARY);
@@ -38,25 +39,17 @@ public class StreamHttpServiceUnary implements IStreamHttpService {
             connection.setDoInput(true);
             connection.setDoOutput(true);
 
-            if(aInputStream instanceof Drainable && !LOG.isDebugEnabled()) {
-                ((Drainable) aInputStream).drainTo(connection.getOutputStream());
-            } else {
-                byte[] outputBytes = IoUtils.toByteArray(aInputStream);
-                LOG.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
-                connection.getOutputStream().write(outputBytes);
-            }
+            streams.sendMessage(aInputStream, connection);
 
             int status = connection.getResponseCode();
             if(status != 200) {
                 fireError(Status.ABORTED, new IOException(connection.getResponseMessage()), "Invalid status code " + status);
                 return;
             }
-            try(InputStream in = connection.getInputStream()) {
-                byte[] bytes = IoUtils.toByteArray(in);
-                LOG.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
-                listener.messagesAvailable(new SingleMessageProducer(getClass().getSimpleName(), bytes));
-                listener.closed(Status.OK, new Metadata());
-            }
+
+            streams.messageAvailable(listener, connection);
+            listener.closed(Status.OK, new Metadata());
+
         } catch (FileNotFoundException e) {
             fireError(Status.NOT_FOUND, e, "Not found");
         } catch (ConnectException e) {

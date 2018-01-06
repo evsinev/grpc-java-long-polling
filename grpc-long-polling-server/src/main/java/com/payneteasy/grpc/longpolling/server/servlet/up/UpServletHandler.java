@@ -1,39 +1,35 @@
 package com.payneteasy.grpc.longpolling.server.servlet.up;
 
 import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
-import com.payneteasy.grpc.longpolling.server.LongPollingServerTransport;
 import com.payneteasy.grpc.longpolling.server.servlet.ITransportRegistry;
 import com.payneteasy.grpc.longpolling.server.servlet.MethodCall;
 import com.payneteasy.grpc.longpolling.server.servlet.TransportHolder;
-import io.grpc.internal.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static com.payneteasy.grpc.longpolling.common.SingleMessageProducer.readFully;
 
 public class UpServletHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(UpServletHandler.class);
 
-    private final LongPollingServerTransport serverTransport;
     private final ITransportRegistry         transportRegistry;
 
-    public UpServletHandler(ITransportRegistry aRegistry, LongPollingServerTransport aTransport) {
-        serverTransport   = aTransport;
+    public UpServletHandler(ITransportRegistry aRegistry) {
         transportRegistry = aRegistry;
     }
 
 
-    public void handle(HttpServletRequest aRequest, MethodCall aMethod, HttpServletResponse aResponse) throws IOException {
+    public void handle(HttpServletRequest aRequest, MethodCall aMethod) throws IOException {
         LOG.debug("Finding 'UP' transport: {}", aMethod.getStreamId().getTransportId());
-        TransportHolder transportHolder = transportRegistry.getOrCreateTransportListener(aMethod.getStreamId().getTransportId(), serverTransport);
+        TransportHolder transportHolder = transportRegistry.getOrCreateTransportListener(aMethod.getStreamId().getTransportId());
 
         LOG.debug("Finding 'UP' stream   : {}", aMethod.getStreamId());
 
-        byte[] buffer = IoUtils.toByteArray(aRequest.getInputStream());
-        SingleMessageProducer message = new SingleMessageProducer(getClass().getSimpleName(), buffer);
+        SingleMessageProducer message = readFully(getClass(), aRequest.getInputStream());
 
         UpServerStream stream = transportHolder.getOrCreateStream(aMethod.getStreamId(), aMethod.getMethod());
         stream.sendToGrpc(message);

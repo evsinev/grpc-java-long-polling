@@ -6,7 +6,9 @@ import io.grpc.ManagedChannel;
 import io.grpc.examples.helloworld.GreeterGrpc;
 import io.grpc.examples.helloworld.HelloReply;
 import io.grpc.examples.helloworld.HelloRequest;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +24,10 @@ public class HelloWorldClientTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(HelloWorldClientTest.class);
 
-    @Test(timeout = 10_000)
-    public void test() {
+    HelloWorldServer server;
+
+    @Before
+    public void before() {
         HttpServlet servlet = new HttpServlet() {
             @Override
             protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -31,8 +35,17 @@ public class HelloWorldClientTest {
             }
         };
 
-        HelloWorldServer server = new HelloWorldServer(9096, servlet);
+        server = new HelloWorldServer(9096, servlet);
         server.start();
+    }
+
+    @After
+    public void after() {
+        server.shutdown();
+    }
+
+    @Test(timeout = 10_000)
+    public void test() {
 
         ManagedChannel channel = LongPollingChannelBuilder.forTarget("http://localhost:9096/test").build();
         GreeterGrpc.GreeterBlockingStub service = GreeterGrpc
@@ -44,7 +57,6 @@ public class HelloWorldClientTest {
         LOG.debug("reply: {}", reply);
         Assert.assertEquals("test 2", reply.getMessage());
 
-        server.shutdown();
 
     }
 }

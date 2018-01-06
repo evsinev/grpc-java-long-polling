@@ -17,6 +17,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.payneteasy</groupId>
+            <artifactId>ber-tlv</artifactId>
+            <version>1.0-8</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
