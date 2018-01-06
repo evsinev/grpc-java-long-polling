@@ -68,7 +68,7 @@ public class LongPollingClientTransport implements ConnectionClientTransport {
         if(method.getType() == MethodDescriptor.MethodType.UNARY) {
             return new LongPollingClientStreamUnary(executor, baseUrl, transportId.generateNextStreamId(), method, headers, callOptions);
         } else {
-            return new LongPollingClientStreamBidi(executor, baseUrl, transportId.generateNextStreamId(), method, headers, callOptions, transportActive);
+            return new LongPollingClientStreamBidi(executor, baseUrl, transportId.generateNextStreamId(), method, transportActive);
         }
     }
 

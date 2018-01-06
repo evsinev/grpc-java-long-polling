@@ -1,7 +1,7 @@
 package com.payneteasy.grpc.longpolling.test.sreaming;
 
 import com.payneteasy.grpc.longpolling.client.LongPollingChannelBuilder;
-import com.payneteasy.grpc.longpolling.test.helloworld.HelloWorldServer;
+import com.payneteasy.grpc.longpolling.test.util.SimpleJettyServer;
 import com.payneteasy.tlv.HexUtil;
 import io.grpc.ManagedChannel;
 import io.grpc.examples.manualflowcontrol.HelloReply;
@@ -9,6 +9,7 @@ import io.grpc.examples.manualflowcontrol.HelloRequest;
 import io.grpc.examples.manualflowcontrol.StreamingGreeterGrpc;
 import io.grpc.stub.ClientCallStreamObserver;
 import io.grpc.stub.ClientResponseObserver;
+import io.grpc.stub.StreamObserver;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -33,23 +34,25 @@ public class StreamingClientTest {
 
             @Override
             protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                LOG.info("GET: {}", req.getRequestURI());
+                LOG.info("DOWN GET: {}", req.getRequestURI());
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                resp.getOutputStream().write(HexUtil.parseHex("0a06 7465 7374 2032"));
+                byte[] output = HexUtil.parseHex("01 0a06 7465 7374 2032");
+                resp.getOutputStream().write(output);
+                LOG.debug("DOWN WROTE: {}", HexUtil.toFormattedHexString(output));
             }
 
             @Override
             protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                LOG.info("POST: {}", req.getRequestURI());
-                resp.getOutputStream().write(HexUtil.parseHex("0a06 7465 7374 2032"));
+                LOG.info("UP POST: {}", req.getRequestURI());
+                LOG.info("Skipping output");
             }
         };
 
-        HelloWorldServer server = new HelloWorldServer(9096, servlet);
+        SimpleJettyServer server = new SimpleJettyServer(9096, servlet);
         server.start();
 
         try {
@@ -66,11 +69,6 @@ public class StreamingClientTest {
             ClientResponseObserver<HelloRequest, HelloReply> observer = new ClientResponseObserver<HelloRequest, HelloReply>() {
                 @Override
                 public void beforeStart(ClientCallStreamObserver<HelloRequest> aRequestStream) {
-                    aRequestStream.disableAutoInboundFlowControl();
-                    aRequestStream.setOnReadyHandler(() -> {
-                        aRequestStream.onNext(HelloRequest.newBuilder().setName("test 1").build());
-                        aRequestStream.onNext(HelloRequest.newBuilder().setName("test 2").build());
-                    });
                 }
 
                 @Override
@@ -90,7 +88,9 @@ public class StreamingClientTest {
                 }
             };
 
-            stub.sayHelloStreaming(observer);
+            StreamObserver<HelloRequest> request = stub.sayHelloStreaming(observer);
+            request.onNext(HelloRequest.newBuilder().setName("test 1").build());
+            request.onNext(HelloRequest.newBuilder().setName("test 2").build());
 
             LOG.info("Waiting 5 seconds ...");
             Assert.assertTrue("We should receive 3 messages", latch.await(5, TimeUnit.SECONDS));

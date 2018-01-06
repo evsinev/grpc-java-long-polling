@@ -1,10 +1,8 @@
 package com.payneteasy.grpc.longpolling.server.servlet;
 
-import com.payneteasy.grpc.longpolling.common.MessagesContainer;
 import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.common.TransportId;
 import com.payneteasy.grpc.longpolling.server.LongPollingServerTransport;
-import com.payneteasy.grpc.longpolling.server.servlet.up.UpServerStream;
 import io.grpc.internal.ServerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +20,6 @@ public class TransportRegistryImpl implements ITransportRegistry {
     private final Map<TransportId, TransportHolder> transports;
     private final LongPollingServerTransport        serverTransport;
 
-    private static final long WAIT_MILLISECONDS = 180_000;
-
     public TransportRegistryImpl(ServerListener listener, LongPollingServerTransport aServerTransport) {
         this.listener = listener;
         transports = new ConcurrentHashMap<>();
@@ -40,7 +36,10 @@ public class TransportRegistryImpl implements ITransportRegistry {
 
     @Override
     public void removeTransport(TransportId aTransportId) {
-        transports.remove(aTransportId);
+        TransportHolder holder = transports.get(aTransportId);
+        if(holder != null) {
+            holder.markAsDisabled();
+        }
     }
 
     @Override
@@ -55,9 +54,9 @@ public class TransportRegistryImpl implements ITransportRegistry {
     }
 
     @Override
-    public MessagesContainer getReadyMessages(StreamId aStreamId, String method) throws InterruptedException, IOException {
+    public TransportHolder getReadyMessages(StreamId aStreamId, String method) throws InterruptedException, IOException {
         TransportHolder holder = getOrCreateTransportListener(aStreamId.getTransportId());
         holder.getOrCreateStream(aStreamId, method);
-        return holder.getMessages(WAIT_MILLISECONDS);
+        return holder;
     }
 }

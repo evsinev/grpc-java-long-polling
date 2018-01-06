@@ -1,8 +1,15 @@
 package com.payneteasy.grpc.longpolling.client;
 
-import com.payneteasy.grpc.longpolling.client.http.*;
+import com.payneteasy.grpc.longpolling.client.http.IStreamHttpService;
+import com.payneteasy.grpc.longpolling.client.http.StreamHttpServiceDownloading;
+import com.payneteasy.grpc.longpolling.client.http.StreamHttpServiceExecutor;
+import com.payneteasy.grpc.longpolling.client.http.StreamHttpServiceUploading;
+import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
+import com.payneteasy.grpc.longpolling.common.SlotSender;
 import com.payneteasy.grpc.longpolling.common.StreamId;
-import io.grpc.*;
+import io.grpc.Metadata;
+import io.grpc.MethodDescriptor;
+import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,15 +23,20 @@ public class LongPollingClientStreamBidi extends AbstractClientStream {
 
     private static final Logger LOG = LoggerFactory.getLogger(LongPollingClientStreamBidi.class);
 
-    private final    IStreamHttpService   downloadingHttpService;
-    private final    IStreamHttpService   uploadingHttpService;
-    private volatile ClientStreamListener clientStreamListener;
+    private volatile ClientStreamListener              clientStreamListener;
+    private final    IStreamHttpService                downloadingHttpService;
+    private final    IStreamHttpService                uploadingHttpService;
+    private final    SlotSender<SingleMessageProducer> slotSender;
 
-    public LongPollingClientStreamBidi(ExecutorService aExecutor, URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod, Metadata aHeaders, CallOptions aCallOptions, AtomicBoolean aTransportActive) {
+    public LongPollingClientStreamBidi(ExecutorService aExecutor, URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod, AtomicBoolean aTransportActive) {
+        slotSender = new SlotSender<>(LOG, aMessage -> clientStreamListener.messagesAvailable(aMessage));
         switch (aMethod.getType()) {
             case BIDI_STREAMING:
+            case SERVER_STREAMING:
                 uploadingHttpService   = new StreamHttpServiceExecutor(aExecutor, new StreamHttpServiceUploading(aBaseUrl, aStreamId, aMethod));
-                downloadingHttpService = new StreamHttpServiceExecutor(aExecutor, new StreamHttpServiceDownloading(aBaseUrl, aStreamId, aMethod, aTransportActive));
+                downloadingHttpService = new StreamHttpServiceExecutor(aExecutor
+                        , new StreamHttpServiceDownloading(aBaseUrl, aStreamId, aMethod, aTransportActive, slotSender)
+                );
                 break;
 
             default:
@@ -58,6 +70,7 @@ public class LongPollingClientStreamBidi extends AbstractClientStream {
     public void request(int numMessages) {
         LOG.trace("request({})", numMessages);
         clientStreamListener.onReady();
+        slotSender.onRequest(numMessages);
         downloadingHttpService.sendMessage(null);
     }
 

@@ -1,16 +1,11 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
 import com.payneteasy.grpc.longpolling.client.util.Urls;
-import com.payneteasy.grpc.longpolling.common.MethodDirection;
-import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
-import com.payneteasy.grpc.longpolling.common.StreamId;
-import com.payneteasy.grpc.longpolling.common.Streams;
-import com.payneteasy.tlv.HexUtil;
+import com.payneteasy.grpc.longpolling.common.*;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
 import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
-import io.grpc.internal.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,18 +23,22 @@ public class StreamHttpServiceDownloading implements IStreamHttpService {
 
     private volatile ClientStreamListener listener;
     private volatile boolean              active = true;
+
     private final    AtomicBoolean        transportActive;
     private final    URL                  sendUrl;
-    private final    Streams              streams = new Streams(LOG);
+    private final    SlotSender<SingleMessageProducer> slotSender;
+    private final    StreamId             streamId;
 
-    public StreamHttpServiceDownloading(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod, AtomicBoolean aTransportActive) {
+    public StreamHttpServiceDownloading(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod, AtomicBoolean aTransportActive, SlotSender<SingleMessageProducer> aSlotSender) {
         sendUrl = Urls.createStreamUrl(aBaseUrl, aStreamId, aMethod, MethodDirection.DOWN);
+        slotSender = aSlotSender;
         transportActive = aTransportActive;
+        streamId = aStreamId;
     }
 
     @Override
     public void sendMessage(InputStream aInputStream) {
-        while (active && transportActive.get()) {
+        if (active && transportActive.get()) {
             try {
                 LOG.debug("Sending to {} ...", sendUrl);
 
@@ -47,12 +46,21 @@ public class StreamHttpServiceDownloading implements IStreamHttpService {
                 connection.connect();
                 
                 int status = connection.getResponseCode();
+                if(status == 410) { // transport is inactive
+                    LOG.warn("Transport is inactive on server side for stream {}", streamId);
+                    listener.closed(Status.OK, new Metadata());
+                    return;
+                }
+                
                 if(status != 200) {
                     fireError(Status.ABORTED, new IOException(connection.getResponseMessage()), "Invalid status code " + status);
                     return;
                 }
 
-                streams.messageAvailable(listener, connection.getInputStream());
+                MessagesContainer messages = MessagesContainer.parse(connection.getInputStream());
+                for (InputStream inputStream : messages.getInputs()) {
+                    slotSender.onSendMessage(SingleMessageProducer.readFully(getClass(), inputStream));
+                }
 
             } catch (FileNotFoundException e) {
                 fireError(Status.NOT_FOUND, e, "Not found");
@@ -65,6 +73,8 @@ public class StreamHttpServiceDownloading implements IStreamHttpService {
             } catch (IOException e) {
                 fireError(Status.DATA_LOSS, e, "IO error");
             }
+        } else {
+            LOG.warn("Transport is inactive on client side for stream {} [active={}, transportActive{}]", streamId, active, transportActive);
         }
 
     }

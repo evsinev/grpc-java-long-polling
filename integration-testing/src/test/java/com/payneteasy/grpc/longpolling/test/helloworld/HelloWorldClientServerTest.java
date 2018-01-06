@@ -4,6 +4,7 @@ import com.payneteasy.grpc.longpolling.client.LongPollingChannelBuilder;
 import com.payneteasy.grpc.longpolling.server.LongPollingServer;
 import com.payneteasy.grpc.longpolling.server.servlet.LongPollingDispatcherServlet;
 import com.payneteasy.grpc.longpolling.test.util.ServerUtils;
+import com.payneteasy.grpc.longpolling.test.util.SimpleJettyServer;
 import io.grpc.ManagedChannel;
 import io.grpc.examples.helloworld.GreeterGrpc;
 import io.grpc.examples.helloworld.HelloReply;
@@ -25,14 +26,11 @@ public class HelloWorldClientServerTest {
         LongPollingServer pollingServer = ServerUtils.createLongPollingServer(new GreeterImpl());
         ServerListener serverListener = pollingServer.waitForServerListener();
 
-        HelloWorldServer server = new HelloWorldServer(9096, new LongPollingDispatcherServlet(serverListener));
+        SimpleJettyServer server = new SimpleJettyServer(9096, new LongPollingDispatcherServlet(serverListener));
         try {
             server.start();
 
-            ManagedChannel channel = LongPollingChannelBuilder.forTarget("http://localhost:9096/test").build();
-            GreeterGrpc.GreeterBlockingStub service = GreeterGrpc
-                    .newBlockingStub(channel)
-                    .withDeadlineAfter(5, TimeUnit.SECONDS);
+            GreeterGrpc.GreeterBlockingStub service = createService();
 
             for(int i=0; i<10; i++) {
                 HelloRequest request = HelloRequest.newBuilder().setName("send " + i).build();
@@ -44,7 +42,12 @@ public class HelloWorldClientServerTest {
         } finally {
             server.shutdown();
         }
+    }
 
-
+    private GreeterGrpc.GreeterBlockingStub createService() {
+        ManagedChannel channel = LongPollingChannelBuilder.forTarget("http://localhost:9096/test").build();
+        return GreeterGrpc
+                .newBlockingStub(channel)
+                .withDeadlineAfter(5, TimeUnit.SECONDS);
     }
 }

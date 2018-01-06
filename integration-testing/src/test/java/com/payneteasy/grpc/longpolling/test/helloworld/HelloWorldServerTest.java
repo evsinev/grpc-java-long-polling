@@ -3,6 +3,7 @@ package com.payneteasy.grpc.longpolling.test.helloworld;
 import com.payneteasy.grpc.longpolling.server.LongPollingServer;
 import com.payneteasy.grpc.longpolling.server.servlet.LongPollingDispatcherServlet;
 import com.payneteasy.grpc.longpolling.test.util.ServerUtils;
+import com.payneteasy.grpc.longpolling.test.util.SimpleJettyServer;
 import com.payneteasy.tlv.HexUtil;
 import io.grpc.internal.IoUtils;
 import io.grpc.internal.ServerListener;
@@ -25,7 +26,7 @@ public class HelloWorldServerTest {
         LongPollingServer pollingServer = ServerUtils.createLongPollingServer(new GreeterImpl());
         ServerListener   serverListener = pollingServer.waitForServerListener();
 
-        HelloWorldServer server = new HelloWorldServer(9096, new LongPollingDispatcherServlet(serverListener));
+        SimpleJettyServer server = new SimpleJettyServer(9096, new LongPollingDispatcherServlet(serverListener));
         server.start();
 
         byte[] buf = send();

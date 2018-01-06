@@ -1,6 +1,7 @@
 package com.payneteasy.grpc.longpolling.test.helloworld;
 
 import com.payneteasy.grpc.longpolling.client.LongPollingChannelBuilder;
+import com.payneteasy.grpc.longpolling.test.util.SimpleJettyServer;
 import com.payneteasy.tlv.HexUtil;
 import io.grpc.ManagedChannel;
 import io.grpc.examples.helloworld.GreeterGrpc;
@@ -24,7 +25,7 @@ public class HelloWorldClientTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(HelloWorldClientTest.class);
 
-    HelloWorldServer server;
+    SimpleJettyServer server;
 
     @Before
     public void before() {
@@ -35,7 +36,7 @@ public class HelloWorldClientTest {
             }
         };
 
-        server = new HelloWorldServer(9096, servlet);
+        server = new SimpleJettyServer(9096, servlet);
         server.start();
     }
 

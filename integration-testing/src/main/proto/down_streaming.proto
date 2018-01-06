@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.downstreaming";
+option java_outer_classname = "DownStreamingProto";
+option objc_class_prefix = "HLWS";
+
+package manualflowcontrol;
+
+// The greeting service definition.
+service DownStreamingGreeter {
+    // Streams a many greetings
+    rpc SayHelloStreaming (DownHelloRequest) returns (stream DownHelloReply) {
+    }
+}
+
+// The request message containing the user's name.
+message DownHelloRequest {
+    string name = 1;
+}
+
+// The response message containing the greetings
+message DownHelloReply {
+    string message = 1;
+}

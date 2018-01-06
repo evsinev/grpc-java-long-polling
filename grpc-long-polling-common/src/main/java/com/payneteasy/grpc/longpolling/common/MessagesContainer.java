@@ -95,6 +95,10 @@ public class MessagesContainer {
                 .array();
     }
 
+    public List<InputStream> getInputs() {
+        return inputs;
+    }
+
     public static class Builder {
         List<InputStream> inputs = new ArrayList<>();
 

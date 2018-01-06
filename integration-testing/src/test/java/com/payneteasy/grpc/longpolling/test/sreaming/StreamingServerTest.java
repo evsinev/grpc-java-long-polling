@@ -2,8 +2,8 @@ package com.payneteasy.grpc.longpolling.test.sreaming;
 
 import com.payneteasy.grpc.longpolling.server.LongPollingServer;
 import com.payneteasy.grpc.longpolling.server.servlet.LongPollingDispatcherServlet;
-import com.payneteasy.grpc.longpolling.test.helloworld.HelloWorldServer;
 import com.payneteasy.grpc.longpolling.test.util.ServerUtils;
+import com.payneteasy.grpc.longpolling.test.util.SimpleJettyServer;
 import com.payneteasy.tlv.HexUtil;
 import io.grpc.internal.IoUtils;
 import io.grpc.internal.ServerListener;
@@ -31,7 +31,7 @@ public class StreamingServerTest {
         CountDownLatch latch = new CountDownLatch(3);
         LongPollingServer longPollingServer = ServerUtils.createLongPollingServer(new StreamingGreeterImpl(latch));
         ServerListener    serverListener    = longPollingServer.waitForServerListener();
-        HelloWorldServer  jettyServer       = new HelloWorldServer(9096, new LongPollingDispatcherServlet(serverListener));
+        SimpleJettyServer jettyServer       = new SimpleJettyServer(9096, new LongPollingDispatcherServlet(serverListener));
 
         jettyServer.start();
 
@@ -51,7 +51,7 @@ public class StreamingServerTest {
         CountDownLatch latch = new CountDownLatch(3);
         LongPollingServer longPollingServer = ServerUtils.createLongPollingServer(new StreamingGreeterImpl(latch));
         ServerListener    serverListener    = longPollingServer.waitForServerListener();
-        HelloWorldServer  jettyServer       = new HelloWorldServer(9096, new LongPollingDispatcherServlet(serverListener));
+        SimpleJettyServer jettyServer       = new SimpleJettyServer(9096, new LongPollingDispatcherServlet(serverListener));
 
         jettyServer.start();
 
@@ -73,7 +73,7 @@ public class StreamingServerTest {
         CountDownLatch latch = new CountDownLatch(3);
         LongPollingServer longPollingServer = ServerUtils.createLongPollingServer(new StreamingGreeterImpl(latch));
         ServerListener    serverListener    = longPollingServer.waitForServerListener();
-        HelloWorldServer  jettyServer       = new HelloWorldServer(9096, new LongPollingDispatcherServlet(serverListener));
+        SimpleJettyServer jettyServer       = new SimpleJettyServer(9096, new LongPollingDispatcherServlet(serverListener));
 
         jettyServer.start();
 

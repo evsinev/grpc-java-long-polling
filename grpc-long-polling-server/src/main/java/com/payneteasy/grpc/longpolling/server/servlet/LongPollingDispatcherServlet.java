@@ -41,7 +41,7 @@ public class LongPollingDispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest aRequest, HttpServletResponse aResponse) throws ServletException, IOException {
+    protected void service(HttpServletRequest aRequest, HttpServletResponse aResponse) throws ServletException, IOException {
         MethodCall call;
         try {
             call = MethodCall.parse(aRequest.getPathInfo());
@@ -63,12 +63,12 @@ public class LongPollingDispatcherServlet extends HttpServlet {
                 break;
 
             case DOWN:
-                downServletHandler.handle(call, aRequest, aResponse);
+                downServletHandler.handle(call, aResponse);
                 break;
 
             default:
                 LOG.error("Method {} not implemented yet", call.getType());
-                aResponse.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+                aResponse.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
         }
 
 //        AsyncContext asyncContext = aRequest.startAsync();

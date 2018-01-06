@@ -3,11 +3,9 @@ package com.payneteasy.grpc.longpolling.server.servlet.unary;
 import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
 import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.server.base.AbstractNoopServerStream;
-import io.grpc.Decompressor;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.internal.IoUtils;
-import io.grpc.internal.ServerStreamListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +68,7 @@ public class UnaryServerStream extends AbstractNoopServerStream {
     @Override
     public void request(int numMessages) {
         LOG.trace("request({})", numMessages);
-        LOG.debug("Sending messagesAvailable ...");
+        LOG.debug("Sending messagesAvailable after request({}) ...", numMessages);
         listener.messagesAvailable(new SingleMessageProducer(getClass().getSimpleName(), outputBuffer));
         LOG.debug("Stream {} half closed", streamId);
         listener.halfClosed();

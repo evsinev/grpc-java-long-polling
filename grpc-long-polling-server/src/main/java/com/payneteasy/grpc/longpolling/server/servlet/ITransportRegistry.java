@@ -1,6 +1,5 @@
 package com.payneteasy.grpc.longpolling.server.servlet;
 
-import com.payneteasy.grpc.longpolling.common.MessagesContainer;
 import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.common.TransportId;
 
@@ -15,5 +14,5 @@ public interface ITransportRegistry {
 
     void enqueueMessage(StreamId aStreamId, InputStream aMessage);
 
-    MessagesContainer getReadyMessages(StreamId aStreamId, String method) throws InterruptedException, IOException;
+    TransportHolder getReadyMessages(StreamId aStreamId, String method) throws InterruptedException, IOException;
 }

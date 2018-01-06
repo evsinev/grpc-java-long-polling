@@ -20,20 +20,18 @@ public class TransportHolder {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransportHolder.class);
 
-    private final ServerTransportListener        listener;
-    private final ArrayBlockingQueue<InputStream> messages;
-    private final Map<StreamId, UpServerStream>   streams;
-    private final ITransportRegistry              registry;
+    private volatile boolean                         enabled;
+    private final    ServerTransportListener         listener;
+    private final    ArrayBlockingQueue<InputStream> messages;
+    private final    Map<StreamId, UpServerStream>   streams;
+    private final    ITransportRegistry              registry;
 
     public TransportHolder(ServerTransportListener aListener, ITransportRegistry aRegistry) {
         listener = aListener;
         messages = new ArrayBlockingQueue<>(10);
         streams = new ConcurrentHashMap<>();
         registry = aRegistry;
-    }
-
-    public ServerTransportListener getTransportListener() {
-        return listener;
+        enabled = true;
     }
 
     public void addMessage(InputStream aMessage) {
@@ -62,5 +60,13 @@ public class TransportHolder {
             }
         }
         return builder.build();
+    }
+
+    public void markAsDisabled() {
+        enabled = false;
+    }
+
+    public boolean isActive() {
+        return !messages.isEmpty() || enabled;
     }
 }
