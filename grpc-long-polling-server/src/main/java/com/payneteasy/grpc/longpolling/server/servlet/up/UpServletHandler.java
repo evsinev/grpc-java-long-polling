@@ -30,11 +30,12 @@ public class UpServletHandler {
         LOG.debug("Finding 'UP' transport: {}", aMethod.getStreamId().getTransportId());
         TransportHolder transportHolder = transportRegistry.getOrCreateTransportListener(aMethod.getStreamId().getTransportId(), serverTransport);
 
-        LOG.debug("Finding 'UP' stream: {}", aMethod.getStreamId());
-        UpServerStream stream = transportHolder.getOrCreateStream(aMethod.getStreamId(), aMethod.getMethod());
+        LOG.debug("Finding 'UP' stream   : {}", aMethod.getStreamId());
 
         byte[] buffer = IoUtils.toByteArray(aRequest.getInputStream());
         SingleMessageProducer message = new SingleMessageProducer(getClass().getSimpleName(), buffer);
+
+        UpServerStream stream = transportHolder.getOrCreateStream(aMethod.getStreamId(), aMethod.getMethod());
         stream.sendToGrpc(message);
     }
 }

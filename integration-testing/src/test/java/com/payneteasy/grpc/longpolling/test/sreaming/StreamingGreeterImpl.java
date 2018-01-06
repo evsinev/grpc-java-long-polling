@@ -7,19 +7,30 @@ import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CountDownLatch;
+
 public class StreamingGreeterImpl extends StreamingGreeterGrpc.StreamingGreeterImplBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingGreeterImpl.class);
 
+    private final CountDownLatch latch;
+
+    public StreamingGreeterImpl(CountDownLatch aLatch) {
+        latch = aLatch;
+    }
+
     @Override
     public StreamObserver<HelloRequest> sayHelloStreaming(StreamObserver<HelloReply> aResponse) {
 
+        LOG.info("Sending reply...");
+        aResponse.onNext(HelloReply.newBuilder().setMessage("hello").build());
         aResponse.onNext(HelloReply.newBuilder().setMessage("hello").build());
 
         return new StreamObserver<HelloRequest>() {
             @Override
             public void onNext(HelloRequest value) {
                 LOG.info("onNext({})", value);
+                latch.countDown();
             }
 
             @Override

@@ -4,7 +4,6 @@ import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.common.TransportId;
 import com.payneteasy.grpc.longpolling.server.LongPollingServerTransport;
 import io.grpc.internal.ServerListener;
-import io.grpc.internal.ServerTransportListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +39,7 @@ public class TransportRegistryImpl implements ITransportRegistry {
 
     @Override
     public void enqueueMessage(StreamId aStreamId, InputStream aMessage) {
+        LOG.debug("Adding message to the queue for {}", aStreamId);
         TransportHolder holder = transports.get(aStreamId.getTransportId());
         if(holder != null) {
             holder.addMessage(aMessage);

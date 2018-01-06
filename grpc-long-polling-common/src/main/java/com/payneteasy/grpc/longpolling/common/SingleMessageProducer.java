@@ -14,10 +14,12 @@ public class SingleMessageProducer implements StreamListener.MessageProducer {
 
     private       InputStream message;
     private final String      messageSource;
+    private final int         size;
 
     public SingleMessageProducer(String aSource, byte[] aBuffer) {
         this.message = new ByteArrayInputStream(aBuffer);
         messageSource = aSource;
+        size = aBuffer.length;
     }
 
 //    public SingleMessageProducer(InputStream message) {
@@ -31,5 +33,12 @@ public class SingleMessageProducer implements StreamListener.MessageProducer {
         InputStream messageToReturn = message;
         message = null;
         return messageToReturn;
+    }
+
+    @Override
+    public String toString() {
+        return "SingleMessageProducer{" +
+                "source=" + messageSource + ", siez=" + size +
+                '}';
     }
 }

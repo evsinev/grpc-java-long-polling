@@ -7,7 +7,7 @@ import com.payneteasy.grpc.longpolling.test.util.ServerUtils;
 import com.payneteasy.tlv.HexUtil;
 import io.grpc.internal.IoUtils;
 import io.grpc.internal.ServerListener;
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,23 +15,32 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class StreamingServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingServerTest.class);
 
-    LongPollingServer longPollingServer = ServerUtils.createLongPollingServer(new StreamingGreeterImpl());
-    ServerListener    serverListener    = longPollingServer.waitForServerListener();
-    HelloWorldServer  jettyServer       = new HelloWorldServer(9096, new LongPollingDispatcherServlet(serverListener));
 
-    @Test
-    public void test() throws IOException {
+    @Test(timeout = 10_000)
+    public void test() throws IOException, InterruptedException {
+        CountDownLatch latch = new CountDownLatch(3);
+        LongPollingServer longPollingServer = ServerUtils.createLongPollingServer(new StreamingGreeterImpl(latch));
+        ServerListener    serverListener    = longPollingServer.waitForServerListener();
+        HelloWorldServer  jettyServer       = new HelloWorldServer(9096, new LongPollingDispatcherServlet(serverListener));
 
         jettyServer.start();
 
         send("UP", "0A 06 74 65  73 74 20 31");
         send("UP", "0A 06 74 65  73 74 20 31");
+        Thread.sleep(200);
         send("UP", "0A 06 74 65  73 74 20 31");
+
+        Assert.assertTrue(latch.await(5, TimeUnit.SECONDS));
+
+        jettyServer.shutdown();
+        longPollingServer.shutdown();
 
 //        byte[] buf = send();
 //        LOG.debug("returned = {}", new String(buf, 2, buf.length - 2));
@@ -53,9 +62,4 @@ public class StreamingServerTest {
 
 
 
-    @After
-    public void shutdown() {
-        jettyServer.shutdown();
-        longPollingServer.shutdown();
-    }
 }
