@@ -5,11 +5,17 @@ import java.util.Objects;
 public class StreamId {
 
     private final TransportId transportId;
-    private final String id;
+    private final String      id;
 
-    StreamId(TransportId transportId, String aStreamId) {
-        this.transportId = transportId;
-        this.id = aStreamId;
+    StreamId(TransportId aTransportId, String aStreamId) {
+        if(aTransportId == null) {
+            throw new IllegalArgumentException("Transport is null");
+        }
+        if(aStreamId == null) {
+            throw new IllegalArgumentException("Stream id is null");
+        }
+        transportId = aTransportId;
+        id = aStreamId;
     }
 
     @Override
@@ -35,13 +41,17 @@ public class StreamId {
         return id;
     }
 
-
     public TransportId getTransportId() {
         return transportId;
     }
 
-
     public static StreamId parse(String aTransportId, String aStreamId) {
+        if(aTransportId == null) {
+            throw new IllegalArgumentException("Transport id is null");
+        }
+        if(aStreamId == null) {
+            throw new IllegalArgumentException("Stream id is null");
+        }
         return new StreamId(TransportId.parse(aTransportId), aStreamId);
     }
 }
