@@ -5,7 +5,6 @@ import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
 import org.junit.Test;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,10 +19,9 @@ import static org.mockito.Mockito.verify;
 
 public class ErrorsTranslatorTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ErrorsTranslatorTest.class);
-
-    ClientStreamListener listener = mock(ClientStreamListener.class);
-    ErrorsTranslator errors = new ErrorsTranslator(LOG, listener, createUrl());
+    private final Logger               log      = mock(Logger.class);
+    private final ClientStreamListener listener = mock(ClientStreamListener.class);
+    private final ErrorsTranslator     errors   = new ErrorsTranslator(log, listener, createUrl());
 
     private URL createUrl()  {
         try {
