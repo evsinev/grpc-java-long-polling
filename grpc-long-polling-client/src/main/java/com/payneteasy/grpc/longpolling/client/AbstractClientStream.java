@@ -9,65 +9,65 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractClientStream implements ClientStream {
 
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     //region Just tracing
 
     @Override
     public void halfClose() {
-        LOG.trace("halfClose()");
+        log.trace("halfClose()");
     }
 
     @Override
     public void setAuthority(String authority) {
-        LOG.trace("setAuthority({})", authority);
+        log.trace("setAuthority({})", authority);
     }
 
     @Override
     public void setFullStreamDecompression(boolean fullStreamDecompression) {
-        LOG.trace("setFullStreamDecompression({})", fullStreamDecompression);
+        log.trace("setFullStreamDecompression({})", fullStreamDecompression);
     }
 
     @Override
     public void setDecompressorRegistry(DecompressorRegistry decompressorRegistry) {
-        LOG.trace("setDecompressorRegistry({}, {})", decompressorRegistry.getAdvertisedMessageEncodings(), decompressorRegistry.getKnownMessageEncodings());
+        log.trace("setDecompressorRegistry({}, {})", decompressorRegistry.getAdvertisedMessageEncodings(), decompressorRegistry.getKnownMessageEncodings());
     }
 
     @Override
     public void setMaxInboundMessageSize(int maxSize) {
-        LOG.trace("setMaxInboundMessageSize({})", maxSize);
+        log.trace("setMaxInboundMessageSize({})", maxSize);
     }
 
     @Override
     public void setMaxOutboundMessageSize(int maxSize) {
-        LOG.trace("setMaxOutboundMessageSize({})", maxSize);
+        log.trace("setMaxOutboundMessageSize({})", maxSize);
     }
 
     @Override
     public Attributes getAttributes() {
-        LOG.trace("getAttributes()");
+        log.trace("getAttributes()");
         return Attributes.EMPTY;
     }
 
     @Override
     public void flush() {
-        LOG.trace("flush()");
+        log.trace("flush()");
     }
 
     @Override
     public boolean isReady() {
-        LOG.trace("isReady()");
+        log.trace("isReady()");
         return true;
     }
 
     @Override
     public void setCompressor(Compressor compressor) {
-        LOG.trace("setCompressor({})", compressor.getMessageEncoding());
+        log.trace("setCompressor({})", compressor.getMessageEncoding());
     }
 
     @Override
     public void setMessageCompression(boolean enable) {
-        LOG.trace("setMessageCompression({})", enable);
+        log.trace("setMessageCompression({})", enable);
     }
     //endregion
 

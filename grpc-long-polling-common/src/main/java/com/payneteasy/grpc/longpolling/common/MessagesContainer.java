@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MessagesContainer {
+public final class MessagesContainer {
 
     public static final MessagesContainer EMPTY = new Builder().build();
 

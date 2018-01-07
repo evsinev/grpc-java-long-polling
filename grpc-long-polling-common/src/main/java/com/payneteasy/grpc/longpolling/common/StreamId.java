@@ -20,11 +20,15 @@ public class StreamId {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         StreamId streamId = (StreamId) o;
-        return Objects.equals(transportId, streamId.transportId) &&
-                Objects.equals(id, streamId.id);
+        return Objects.equals(transportId, streamId.transportId)
+                && Objects.equals(id, streamId.id);
     }
 
     @Override

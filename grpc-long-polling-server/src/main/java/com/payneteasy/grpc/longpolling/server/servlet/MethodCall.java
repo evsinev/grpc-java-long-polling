@@ -47,8 +47,8 @@ public class MethodCall {
 
     @Override
     public String toString() {
-        return methodType +
-                ", " + methodFullname +
-                ", " + streamId;
+        return methodType
+                + ", " + methodFullname
+                + ", " + streamId;
     }
 }

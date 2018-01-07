@@ -28,7 +28,8 @@ public class LongPollingClientStreamBidi extends AbstractClientStream {
     private final    IStreamHttpService                uploadingHttpService;
     private final    SlotSender<SingleMessageProducer> slotSender;
 
-    public LongPollingClientStreamBidi(ExecutorService aExecutor, URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod, AtomicBoolean aTransportActive) {
+    public LongPollingClientStreamBidi(ExecutorService aExecutor, URL aBaseUrl, StreamId aStreamId
+            , MethodDescriptor<?, ?> aMethod, AtomicBoolean aTransportActive) {
         slotSender = new SlotSender<>(LOG, aMessage -> clientStreamListener.messagesAvailable(aMessage));
         switch (aMethod.getType()) {
             case BIDI_STREAMING:

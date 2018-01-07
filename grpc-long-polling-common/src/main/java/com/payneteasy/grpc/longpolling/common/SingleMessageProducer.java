@@ -35,9 +35,9 @@ public class SingleMessageProducer implements StreamListener.MessageProducer {
 
     @Override
     public String toString() {
-        return "SingleMessageProducer{" +
-                "source=" + messageSource + ", siez=" + size +
-                '}';
+        return "SingleMessageProducer{"
+                + "source=" + messageSource + ", siez=" + size
+                + '}';
     }
 
     public static SingleMessageProducer readFully(Class<?> aClass, InputStream aInputStream) throws IOException {

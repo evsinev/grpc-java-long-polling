@@ -3,7 +3,7 @@ package com.payneteasy.grpc.longpolling.common;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class TransportId {
+public final class TransportId {
 
     private final AtomicLong streamIds = new AtomicLong(0);
     private final String id;
@@ -14,8 +14,12 @@ public class TransportId {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         TransportId that = (TransportId) o;
         return Objects.equals(id, that.id);
     }

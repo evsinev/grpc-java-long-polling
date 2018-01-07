@@ -20,7 +20,7 @@ public class LongPollingChannelBuilder extends AbstractManagedChannelImplBuilder
 
     private static final Logger LOG = LoggerFactory.getLogger(LongPollingChannelBuilder.class);
 
-    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
+    private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(10);
 
     private final URL baseUrl;
 
@@ -53,7 +53,7 @@ public class LongPollingChannelBuilder extends AbstractManagedChannelImplBuilder
     @Override
     protected ClientTransportFactory buildTransportFactory() {
         LOG.trace("buildTransportFactory()");
-        return new LongPollingClientTransportFactory(executor, TransportId.generateNew(), baseUrl);
+        return new LongPollingClientTransportFactory(EXECUTOR, TransportId.generateNew(), baseUrl);
     }
 
     @Override

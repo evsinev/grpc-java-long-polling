@@ -29,7 +29,8 @@ public class StreamHttpServiceDownloading implements IStreamHttpService {
     private final    SlotSender<SingleMessageProducer> slotSender;
     private final    StreamId             streamId;
 
-    public StreamHttpServiceDownloading(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod, AtomicBoolean aTransportActive, SlotSender<SingleMessageProducer> aSlotSender) {
+    public StreamHttpServiceDownloading(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod
+            , AtomicBoolean aTransportActive, SlotSender<SingleMessageProducer> aSlotSender) {
         sendUrl = Urls.createStreamUrl(aBaseUrl, aStreamId, aMethod, MethodDirection.DOWN);
         slotSender = aSlotSender;
         transportActive = aTransportActive;

@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 
 public abstract class AbstractNoopServerStream implements ServerStream {
 
-    private  final Logger              LOG;
+    private  final Logger log;
 
     // writeMessage is executed from [grpc-default-executor-0] thread
     // request      is executed from [grpc-default-executor-0] thread
@@ -21,61 +21,61 @@ public abstract class AbstractNoopServerStream implements ServerStream {
 
     public AbstractNoopServerStream(Logger aLog) {
         aLog.trace("Created");
-        this.LOG = aLog;
+        this.log = aLog;
     }
 
     @Override
     public void setListener(ServerStreamListener aListener) {
-        LOG.trace("setListener({})", aListener);
+        log.trace("setListener({})", aListener);
         listener = aListener;
     }
 
     @Nullable
     @Override
     public String getAuthority() {
-        LOG.trace("getAuthority()");
+        log.trace("getAuthority()");
         return null;
     }
 
 
     @Override
     public StatsTraceContext statsTraceContext() {
-        LOG.trace("statsTraceContext()");
+        log.trace("statsTraceContext()");
         return StatsTraceContext.NOOP;
     }
 
     @Override
     public boolean isReady() {
-        LOG.trace("isReady()");
+        log.trace("isReady()");
         return true;
     }
 
     @Override
     public void setCompressor(Compressor compressor) {
-        LOG.trace("setCompressor({})", compressor);
+        log.trace("setCompressor({})", compressor);
 
     }
 
     @Override
     public void setMessageCompression(boolean enable) {
-        LOG.trace("setMessageCompression({})", enable);
+        log.trace("setMessageCompression({})", enable);
 
     }
 
     @Override
     public Attributes getAttributes() {
-        LOG.trace("getAttributes()");
+        log.trace("getAttributes()");
         return Attributes.EMPTY;
     }
 
     @Override
     public void setDecompressor(Decompressor decompressor) {
-        LOG.trace("setDecompressor({})", decompressor);
+        log.trace("setDecompressor({})", decompressor);
     }
 
     @Override
     public void flush() {
-        LOG.trace("flush()");
+        log.trace("flush()");
     }
 
 

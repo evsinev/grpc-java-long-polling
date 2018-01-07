@@ -13,10 +13,10 @@ import java.net.HttpURLConnection;
 
 public class Streams {
 
-    private final Logger LOG;
+    private final Logger log;
 
     public Streams(Logger aLogger) {
-        LOG = aLogger;
+        log = aLogger;
     }
 
     /**
@@ -28,11 +28,11 @@ public class Streams {
     }
 
     public void sendMessage(InputStream aInputStream, OutputStream aOut) throws IOException {
-        if(aInputStream instanceof Drainable && !LOG.isDebugEnabled()) {
+        if(aInputStream instanceof Drainable && !log.isDebugEnabled()) {
             ((Drainable) aInputStream).drainTo(aOut);
         } else {
             byte[] outputBytes = IoUtils.toByteArray(aInputStream);
-            LOG.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
+            log.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
             aOut.write(outputBytes);
         }
     }
@@ -44,7 +44,7 @@ public class Streams {
     public void messageAvailable(ClientStreamListener aListener, InputStream aInputStream) throws IOException {
         try(InputStream in = aInputStream) {
             byte[] bytes = IoUtils.toByteArray(in);
-            LOG.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
+            log.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
             aListener.messagesAvailable(new SingleMessageProducer(getClass().getSimpleName(), bytes));
         }
 

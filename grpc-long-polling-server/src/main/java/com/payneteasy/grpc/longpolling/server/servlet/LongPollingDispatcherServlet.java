@@ -26,12 +26,12 @@ public class LongPollingDispatcherServlet extends HttpServlet {
     private final UpServletHandler   upServletHandler;
     private final DownServletHandler downServletHandler;
 
-    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
+    private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(10);
 
 
     public LongPollingDispatcherServlet(ServerListener aListener) {
         Preconditions.checkNotNull(aListener, "ServerListener must not be null");
-        LongPollingServerTransport serverTransport   = new LongPollingServerTransport(executor);
+        LongPollingServerTransport serverTransport   = new LongPollingServerTransport(EXECUTOR);
         ITransportRegistry         transportRegistry = new TransportRegistryImpl(aListener, serverTransport);
 
         serverListener     = aListener;
