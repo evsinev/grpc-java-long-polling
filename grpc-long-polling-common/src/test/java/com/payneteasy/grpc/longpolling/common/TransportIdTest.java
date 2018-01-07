@@ -9,26 +9,26 @@ import static org.junit.Assert.*;
 
 public class TransportIdTest {
 
-    private static final TransportId t1 = TransportId.parse("1");
+    private static final TransportId T1 = parse("1");
 
     @Test
     public void equals() throws Exception {
         TransportId transportId = TransportId.generateNew();
         assertEquals(transportId.getTransportId(), parse(transportId.getTransportId()).getTransportId());
-        assertNotEquals(t1, parse("2"));
-        assertEquals(t1, t1);
+        assertNotEquals(T1, parse("2"));
+        assertEquals(T1, T1);
         String nullString = null;
         //noinspection ConstantConditions
-        assertNotEquals(t1, nullString);
+        assertNotEquals(T1, nullString);
         String transportString = "test";
-        assertNotEquals(t1, transportString);
+        assertNotEquals(T1, transportString);
     }
 
     @Test
     public void testHashCode() throws Exception {
-        assertEquals(t1.hashCode(), TransportId.parse("1").hashCode());
-        assertNotEquals(t1.hashCode(), TransportId.parse("2").hashCode());
-        assertEquals(Objects.hash("1"), t1.hashCode());
+        assertEquals(T1.hashCode(), parse("1").hashCode());
+        assertNotEquals(T1.hashCode(), parse("2").hashCode());
+        assertEquals(Objects.hash("1"), T1.hashCode());
     }
 
     @Test
@@ -40,7 +40,7 @@ public class TransportIdTest {
 
     @Test
     public void getTransportId() throws Exception {
-        assertEquals("1", t1.getTransportId());
+        assertEquals("1", T1.getTransportId());
     }
 
     @Test
@@ -57,7 +57,7 @@ public class TransportIdTest {
 
     @Test
     public void testToString() throws Exception {
-        assertEquals("TID:1", t1.toString());
+        assertEquals("TID:1", T1.toString());
     }
 
 }
