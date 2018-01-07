@@ -1,8 +1,5 @@
 package com.payneteasy.grpc.longpolling.client;
 
-import com.payneteasy.grpc.longpolling.client.http.ITransportHttpService;
-import com.payneteasy.grpc.longpolling.client.http.TransportHttpServiceExecutor;
-import com.payneteasy.grpc.longpolling.client.http.TransportHttpServiceNoop;
 import com.payneteasy.grpc.longpolling.common.TransportId;
 import io.grpc.internal.ClientTransportFactory;
 import io.grpc.internal.ConnectionClientTransport;
@@ -32,8 +29,7 @@ public class LongPollingClientTransportFactory implements ClientTransportFactory
     @Override
     public ConnectionClientTransport newClientTransport(SocketAddress aAddress, String authority, @Nullable String userAgent, @Nullable ProxyParameters proxy) {
         LOG.trace("newClientTransport(address={}, authority:{}, userAgent:{}, proxy:{})", aAddress, authority, userAgent, proxy);
-        ITransportHttpService httpService = new TransportHttpServiceExecutor(executorService, new TransportHttpServiceNoop(transportId));
-        return new LongPollingClientTransport(executorService, baseUrl, transportId, httpService);
+        return new LongPollingClientTransport(executorService, baseUrl, transportId);
     }
 
     @Override

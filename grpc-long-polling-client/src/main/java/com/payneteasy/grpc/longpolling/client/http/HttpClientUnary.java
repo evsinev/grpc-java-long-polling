@@ -1,11 +1,9 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
-import com.payneteasy.grpc.longpolling.client.util.Urls;
+import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
 import com.payneteasy.grpc.longpolling.common.MethodDirection;
-import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.common.Streams;
 import io.grpc.Metadata;
-import io.grpc.MethodDescriptor;
 import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
 import org.slf4j.Logger;
@@ -18,16 +16,17 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class StreamHttpServiceUnary implements IStreamHttpService {
+public class HttpClientUnary implements IHttpClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StreamHttpServiceUnary.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpClientUnary.class);
 
-    private volatile ClientStreamListener listener;
+    private final    ClientStreamListener listener;
     private final    URL                  sendUrl;
     private final    Streams              streams = new Streams(LOG);
 
-    public StreamHttpServiceUnary(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod) {
-        sendUrl = Urls.createStreamUrl(aBaseUrl, aStreamId, aMethod, MethodDirection.UNARY);
+    public HttpClientUnary(ServerEndPoint aEndPoint, ClientStreamListener aListener) {
+        listener = aListener;
+        sendUrl  = aEndPoint.createUrl(MethodDirection.UNARY);
     }
 
     @Override
@@ -72,8 +71,4 @@ public class StreamHttpServiceUnary implements IStreamHttpService {
        // we can't cancel HttpURLConnection execution
     }
 
-    @Override
-    public void setClientStreamListener(ClientStreamListener aListener) {
-        listener = aListener;
-    }
 }

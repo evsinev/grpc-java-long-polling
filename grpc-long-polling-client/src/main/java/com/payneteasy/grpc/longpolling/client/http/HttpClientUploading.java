@@ -1,12 +1,10 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
-import com.payneteasy.grpc.longpolling.client.util.Urls;
+import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
 import com.payneteasy.grpc.longpolling.common.MethodDirection;
-import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.common.Streams;
 import com.payneteasy.tlv.HexUtil;
 import io.grpc.Metadata;
-import io.grpc.MethodDescriptor;
 import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
 import io.grpc.internal.IoUtils;
@@ -20,16 +18,17 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class StreamHttpServiceUploading implements IStreamHttpService {
+public class HttpClientUploading implements IHttpClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StreamHttpServiceUploading.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpClientUploading.class);
 
-    private volatile ClientStreamListener listener;
-    private final    URL                  sendUrl;
-    private final    Streams              streams = new Streams(LOG);
+    private final ClientStreamListener listener;
+    private final URL                  sendUrl;
+    private final Streams              streams = new Streams(LOG);
 
-    public StreamHttpServiceUploading(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod) {
-        sendUrl = Urls.createStreamUrl(aBaseUrl, aStreamId, aMethod, MethodDirection.UP);
+    public HttpClientUploading(ServerEndPoint aEndpoint, ClientStreamListener aListener) {
+        sendUrl  = aEndpoint.createUrl(MethodDirection.UP);
+        listener = aListener;
     }
 
     @Override
@@ -88,8 +87,4 @@ public class StreamHttpServiceUploading implements IStreamHttpService {
         // we can't cancel HttpURLConnection execution
     }
 
-    @Override
-    public void setClientStreamListener(ClientStreamListener aListener) {
-        listener = aListener;
-    }
 }

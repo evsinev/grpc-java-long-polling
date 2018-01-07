@@ -1,14 +1,14 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
-import com.payneteasy.grpc.longpolling.client.util.Urls;
+import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
 import com.payneteasy.grpc.longpolling.common.*;
 import io.grpc.Metadata;
-import io.grpc.MethodDescriptor;
 import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,24 +17,30 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class StreamHttpServiceDownloading implements IStreamHttpService {
+public class HttpClientDownloading implements IHttpClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StreamHttpServiceDownloading.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpClientDownloading.class);
 
-    private volatile ClientStreamListener listener;
-    private volatile boolean              active = true;
+    public static final InputStream EMPTY_INPUT = new ByteArrayInputStream(new byte[0]);
 
-    private final    AtomicBoolean        transportActive;
-    private final    URL                  sendUrl;
+    private volatile boolean                           active;
+
+    private final    ClientStreamListener              listener;
+    private final    AtomicBoolean                     transportActive;
+    private final    URL                               sendUrl;
     private final    SlotSender<SingleMessageProducer> slotSender;
-    private final    StreamId             streamId;
+    private final    StreamId                          streamId;
 
-    public StreamHttpServiceDownloading(URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod
-            , AtomicBoolean aTransportActive, SlotSender<SingleMessageProducer> aSlotSender) {
-        sendUrl = Urls.createStreamUrl(aBaseUrl, aStreamId, aMethod, MethodDirection.DOWN);
-        slotSender = aSlotSender;
+    public HttpClientDownloading(ServerEndPoint aEndpoint
+            , AtomicBoolean aTransportActive, SlotSender<SingleMessageProducer> aSlotSender
+            , ClientStreamListener aListener
+    ) {
+        slotSender      = aSlotSender;
         transportActive = aTransportActive;
-        streamId = aStreamId;
+        streamId        = aEndpoint.getStreamId();
+        listener        = aListener;
+        active          = true;
+        sendUrl         = aEndpoint.createUrl(MethodDirection.DOWN);
     }
 
     @Override
@@ -93,8 +99,4 @@ public class StreamHttpServiceDownloading implements IStreamHttpService {
         active = false;
     }
 
-    @Override
-    public void setClientStreamListener(ClientStreamListener aListener) {
-        listener = aListener;
-    }
 }

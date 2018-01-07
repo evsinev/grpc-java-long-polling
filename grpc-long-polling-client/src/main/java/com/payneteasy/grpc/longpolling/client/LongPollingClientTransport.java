@@ -1,7 +1,7 @@
 package com.payneteasy.grpc.longpolling.client;
 
 import com.google.common.util.concurrent.SettableFuture;
-import com.payneteasy.grpc.longpolling.client.http.ITransportHttpService;
+import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
 import com.payneteasy.grpc.longpolling.common.TransportId;
 import io.grpc.*;
 import io.grpc.internal.ClientStream;
@@ -24,14 +24,12 @@ public class LongPollingClientTransport implements ConnectionClientTransport {
 
     private final LogId logId = LogId.allocate(getClass().getName());
 
-    private final ITransportHttpService httpService;
     private final TransportId transportId;
     private final URL baseUrl;
     private final ExecutorService executor;
     private final AtomicBoolean   transportActive = new AtomicBoolean(true);
 
-    public LongPollingClientTransport(ExecutorService aExecutor, URL aBaseUrl, TransportId aId, ITransportHttpService httpService) {
-        this.httpService = httpService;
+    public LongPollingClientTransport(ExecutorService aExecutor, URL aBaseUrl, TransportId aId) {
         baseUrl = aBaseUrl;
         transportId = aId;
         executor = aExecutor;
@@ -47,7 +45,7 @@ public class LongPollingClientTransport implements ConnectionClientTransport {
     @Override
     public Runnable start(Listener listener) {
         LOG.trace("start({})", listener);
-        return () -> httpService.sendOpenTransport(listener);
+        return () -> executor.execute(listener::transportReady);
     }
 
     @Override
@@ -65,10 +63,21 @@ public class LongPollingClientTransport implements ConnectionClientTransport {
     @Override
     public ClientStream newStream(MethodDescriptor<?, ?> method, Metadata headers, CallOptions callOptions) {
         LOG.trace("newStream({}, {}, {}, {})", method.getFullMethodName(), method.getType(), headers, callOptions);
-        if(method.getType() == MethodDescriptor.MethodType.UNARY) {
-            return new LongPollingClientStreamUnary(executor, baseUrl, transportId.generateNextStreamId(), method);
-        } else {
-            return new LongPollingClientStreamBidi(executor, baseUrl, transportId.generateNextStreamId(), method, transportActive);
+
+        ServerEndPoint endPoint = new ServerEndPoint(baseUrl, transportId.generateNextStreamId(), method);
+
+        switch (method.getType()) {
+            case UNARY:
+                return new LongPollingClientStreamUnary(executor, endPoint);
+
+            case BIDI_STREAMING:
+                return new LongPollingClientStreamBidi(executor, endPoint, transportActive);
+
+            case SERVER_STREAMING:
+                return new LongPollingClientStreamTap(executor, endPoint, transportActive);
+
+            default:
+                throw new IllegalStateException("Unsupported " + method.getType());
         }
     }
 

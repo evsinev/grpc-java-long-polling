@@ -42,7 +42,7 @@ public class StreamingClientTest {
                 }
                 byte[] output = HexUtil.parseHex("01 0a06 7465 7374 2032");
                 resp.getOutputStream().write(output);
-                LOG.debug("DOWN WROTE: {}", HexUtil.toFormattedHexString(output));
+                LOG.debug("DOWN WRITTEN: {}", HexUtil.toFormattedHexString(output));
             }
 
             @Override
