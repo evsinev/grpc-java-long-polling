@@ -69,7 +69,7 @@ public class MessagesContainer {
         return builder.build();
     }
 
-    static int readLength(InputStream aInputStream) throws IOException {
+    private static int readLength(InputStream aInputStream) throws IOException {
         int b1 = aInputStream.read();
         if(b1 < 0) {
             return -1;
@@ -88,7 +88,7 @@ public class MessagesContainer {
         return ByteBuffer.wrap(buf).order(ByteOrder.BIG_ENDIAN).getInt();
     }
 
-    static byte[] getLengthBytes(int aLength) {
+    private static byte[] getLengthBytes(int aLength) {
         return ByteBuffer.allocate(4)
                 .order(ByteOrder.BIG_ENDIAN)
                 .putInt(aLength)
@@ -100,7 +100,7 @@ public class MessagesContainer {
     }
 
     public static class Builder {
-        List<InputStream> inputs = new ArrayList<>();
+        private final List<InputStream> inputs = new ArrayList<>();
 
         public Builder add(InputStream aInputStream) throws IOException {
             byte[] buf = IoUtils.toByteArray(aInputStream);
@@ -119,7 +119,7 @@ public class MessagesContainer {
         }
     }
 
-    static byte[] readBytes(InputStream aInputStream, int aLength) throws IOException {
+    private static byte[] readBytes(InputStream aInputStream, int aLength) throws IOException {
         byte[] buf = new byte[aLength];
         for(int i=0; i<buf.length; i++) {
             int b = aInputStream.read();

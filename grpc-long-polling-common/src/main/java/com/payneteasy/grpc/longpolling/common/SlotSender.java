@@ -7,14 +7,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class SlotSender<T> {
 
 
-    public interface SendFunction<T> {
-        void sendMessage(T aMessage);
-    }
-
     private final    ArrayBlockingQueue<T>       messages;
     private final    ArrayBlockingQueue<Integer> slots;
     private final    SendFunction<T>             sendFunction;
     private final    Logger                      logger;
+
+    public interface SendFunction<T> {
+        void sendMessage(T aMessage);
+    }
 
     public SlotSender(Logger aLogger, SendFunction<T> aSendFunction) {
         messages     = new ArrayBlockingQueue<>(10);

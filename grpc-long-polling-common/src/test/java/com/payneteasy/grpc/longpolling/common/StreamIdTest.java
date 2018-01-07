@@ -34,12 +34,14 @@ public class StreamIdTest {
         assertTrue(STREAM.equals(StreamId.parse("1", "2")));
         assertFalse(STREAM.equals(StreamId.parse("1", "1")));
         assertFalse(STREAM.equals(StreamId.parse("2", "2")));
+        String helloString = "hello";
         //noinspection EqualsBetweenInconvertibleTypes
-        assertFalse(STREAM.equals("hello"));
+        assertFalse(STREAM.equals(helloString));
         //noinspection EqualsWithItself
         assertTrue(STREAM.equals(STREAM));
-        //noinspection ObjectEqualsNull
-        assertFalse(STREAM.equals(null));
+        Object nullObject = null;
+        //noinspection ConstantConditions
+        assertFalse(STREAM.equals(nullObject));
     }
 
     @Test

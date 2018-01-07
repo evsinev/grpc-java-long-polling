@@ -69,9 +69,8 @@ public class LongPollingDispatcherServlet extends HttpServlet {
             default:
                 LOG.error("Method {} not implemented yet", call.getType());
                 aResponse.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+                break;
         }
-
-//        AsyncContext asyncContext = aRequest.startAsync();
     }
 
     @Override

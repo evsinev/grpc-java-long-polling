@@ -6,16 +6,16 @@ import static org.junit.Assert.*;
 
 public class LongPollingServerProviderTest {
 
-    private LongPollingServerProvider provider;
+    private LongPollingServerProvider provider = new LongPollingServerProvider();
 
     @Test
     public void isAvailable() throws Exception {
-        assertTrue(new LongPollingServerProvider().isAvailable());
+        assertTrue(provider.isAvailable());
     }
 
     @Test
     public void priority() throws Exception {
-        assertEquals(5, new LongPollingServerProvider().priority());
+        assertEquals(5, provider.priority());
     }
 
     @Test

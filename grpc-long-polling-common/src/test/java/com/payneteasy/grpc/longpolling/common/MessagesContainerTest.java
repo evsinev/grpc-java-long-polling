@@ -6,17 +6,12 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import static com.payneteasy.grpc.longpolling.common.MessagesContainer.parse;
 import static com.payneteasy.tlv.HexUtil.parseHex;
 import static org.junit.Assert.*;
 
 public class MessagesContainerTest {
-
-    @Test
-    public void writeToOutput() throws Exception {
-    }
 
     @Test
     public void oneMessage() throws Exception {

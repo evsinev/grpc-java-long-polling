@@ -79,8 +79,8 @@ public class StreamingServerTest {
 
         String response = send("DOWN", "0A 06 74 65  73 74 20 32");
         
-        if(!response.equals("[23] :  02 00 00 00  07 0A 05 68  65 6C 6C 6F  00 00 00 07  0A 05 68 65  6C 6C 6F")
-                && !response.equals("[8] :  01 0A 05 68  65 6C 6C 6F")) {
+        if(!"[23] :  02 00 00 00  07 0A 05 68  65 6C 6C 6F  00 00 00 07  0A 05 68 65  6C 6C 6F".equals(response)
+                && !"[8] :  01 0A 05 68  65 6C 6C 6F".equals(response)) {
             fail("Response is wrong: " + response);
         }
 

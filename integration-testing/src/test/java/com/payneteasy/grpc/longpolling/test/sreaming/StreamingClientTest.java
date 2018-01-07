@@ -69,6 +69,7 @@ public class StreamingClientTest {
             ClientResponseObserver<HelloRequest, HelloReply> observer = new ClientResponseObserver<HelloRequest, HelloReply>() {
                 @Override
                 public void beforeStart(ClientCallStreamObserver<HelloRequest> aRequestStream) {
+                    // do not disableAutoInboundFlowControl
                 }
 
                 @Override

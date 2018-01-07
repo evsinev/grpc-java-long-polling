@@ -25,7 +25,7 @@ public class HelloWorldClientTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(HelloWorldClientTest.class);
 
-    SimpleJettyServer server;
+    private SimpleJettyServer server;
 
     @Before
     public void before() {

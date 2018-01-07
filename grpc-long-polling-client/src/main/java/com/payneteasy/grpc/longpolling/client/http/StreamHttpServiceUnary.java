@@ -69,7 +69,7 @@ public class StreamHttpServiceUnary implements IStreamHttpService {
 
     @Override
     public void cancelStream(Status aReason) {
-
+       // we can't cancel HttpURLConnection execution
     }
 
     @Override

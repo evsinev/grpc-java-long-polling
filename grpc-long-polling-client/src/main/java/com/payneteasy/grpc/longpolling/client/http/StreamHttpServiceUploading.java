@@ -85,7 +85,7 @@ public class StreamHttpServiceUploading implements IStreamHttpService {
 
     @Override
     public void cancelStream(Status aReason) {
-
+        // we can't cancel HttpURLConnection execution
     }
 
     @Override
