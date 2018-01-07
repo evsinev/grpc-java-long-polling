@@ -92,7 +92,7 @@ public class StreamingServerTest {
     private String send(String aMethodDirection, String aHex) throws IOException {
         String urlText = String.format("http://localhost:9096/test/manualflowcontrol.StreamingGreeter/SayHelloStreaming/%s/801VJ7k2ThCAjUUF7lKlDw/1", aMethodDirection);
         URL url = new URL(urlText);
-        LOG.info("Sending to {} ...", url);
+        LOG.debug("Sending to {} ...", url);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoInput(true);
         connection.setDoOutput(true);

@@ -12,8 +12,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.payneteasy"    level="info" />
-    <logger name="org.eclipse.jetty" level="warn" />
+    <logger name="com.payneteasy" level="info" />
 
 
     <root level="info">

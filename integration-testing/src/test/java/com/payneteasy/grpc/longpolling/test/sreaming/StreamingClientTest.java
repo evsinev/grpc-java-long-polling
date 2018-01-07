@@ -34,7 +34,7 @@ public class StreamingClientTest {
 
             @Override
             protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                LOG.info("DOWN GET: {}", req.getRequestURI());
+                LOG.debug("DOWN GET: {}", req.getRequestURI());
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
@@ -47,8 +47,8 @@ public class StreamingClientTest {
 
             @Override
             protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                LOG.info("UP POST: {}", req.getRequestURI());
-                LOG.info("Skipping output");
+                LOG.debug("UP POST: {}", req.getRequestURI());
+                LOG.debug("Skipping output");
             }
         };
 
@@ -93,7 +93,7 @@ public class StreamingClientTest {
             request.onNext(HelloRequest.newBuilder().setName("test 1").build());
             request.onNext(HelloRequest.newBuilder().setName("test 2").build());
 
-            LOG.info("Waiting 5 seconds ...");
+            LOG.debug("Waiting 5 seconds ...");
             Assert.assertTrue("We should receive 3 messages", latch.await(5, TimeUnit.SECONDS));
 
             channel.shutdown();

@@ -22,14 +22,14 @@ public class StreamingGreeterImpl extends StreamingGreeterGrpc.StreamingGreeterI
     @Override
     public StreamObserver<HelloRequest> sayHelloStreaming(StreamObserver<HelloReply> aResponse) {
 
-        LOG.info("Sending reply...");
+        LOG.debug("Sending reply...");
         aResponse.onNext(HelloReply.newBuilder().setMessage("hello").build());
         aResponse.onNext(HelloReply.newBuilder().setMessage("hello").build());
 
         return new StreamObserver<HelloRequest>() {
             @Override
             public void onNext(HelloRequest value) {
-                LOG.info("onNext({})", value);
+                LOG.debug("onNext({})", value);
                 latch.countDown();
             }
 

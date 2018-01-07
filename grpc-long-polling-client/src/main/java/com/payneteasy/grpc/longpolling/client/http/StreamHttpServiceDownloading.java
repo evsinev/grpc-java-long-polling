@@ -69,7 +69,7 @@ public class StreamHttpServiceDownloading implements IStreamHttpService {
                 if(transportActive.get()) {
                     fireError(Status.UNAVAILABLE, e, "Cannot connect");
                 } else {
-                    LOG.warn("Skipping throwing an error because transport is inactive. Error is {}", e.getMessage());
+                    LOG.warn("Skipping throwing an error because transport is inactive. Error was '{}'", e.getMessage());
                 }
             } catch (IOException e) {
                 fireError(Status.DATA_LOSS, e, "IO error");
