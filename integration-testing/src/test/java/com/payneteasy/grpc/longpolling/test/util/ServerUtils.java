@@ -2,7 +2,6 @@ package com.payneteasy.grpc.longpolling.test.util;
 
 import com.payneteasy.grpc.longpolling.server.LongPollingServer;
 import com.payneteasy.grpc.longpolling.server.LongPollingServerBuilder;
-import com.payneteasy.grpc.longpolling.test.helloworld.GreeterImpl;
 import io.grpc.BindableService;
 import io.grpc.Server;
 

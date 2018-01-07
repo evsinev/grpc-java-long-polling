@@ -3,14 +3,12 @@ package com.payneteasy.grpc.longpolling.server.base;
 import io.grpc.Attributes;
 import io.grpc.Compressor;
 import io.grpc.Decompressor;
-import io.grpc.Metadata;
 import io.grpc.internal.ServerStream;
 import io.grpc.internal.ServerStreamListener;
 import io.grpc.internal.StatsTraceContext;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletResponse;
 
 public abstract class AbstractNoopServerStream implements ServerStream {
 

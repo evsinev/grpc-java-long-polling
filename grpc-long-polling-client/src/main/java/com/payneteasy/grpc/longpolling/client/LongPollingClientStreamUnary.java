@@ -4,7 +4,6 @@ import com.payneteasy.grpc.longpolling.client.http.IStreamHttpService;
 import com.payneteasy.grpc.longpolling.client.http.StreamHttpServiceExecutor;
 import com.payneteasy.grpc.longpolling.client.http.StreamHttpServiceUnary;
 import com.payneteasy.grpc.longpolling.common.StreamId;
-import io.grpc.CallOptions;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
 import io.grpc.Status;
@@ -23,7 +22,7 @@ public class LongPollingClientStreamUnary extends AbstractClientStream {
     private final    IStreamHttpService   streamHttpService;
     private volatile ClientStreamListener clientStreamListener;
 
-    public LongPollingClientStreamUnary(ExecutorService aExecutor, URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod, Metadata aHeaders, CallOptions aCallOptions) {
+    public LongPollingClientStreamUnary(ExecutorService aExecutor, URL aBaseUrl, StreamId aStreamId, MethodDescriptor<?, ?> aMethod) {
         streamHttpService = new StreamHttpServiceExecutor(aExecutor, new StreamHttpServiceUnary(aBaseUrl, aStreamId, aMethod));
     }
 

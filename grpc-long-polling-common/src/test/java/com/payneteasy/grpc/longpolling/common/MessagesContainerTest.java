@@ -1,7 +1,6 @@
 package com.payneteasy.grpc.longpolling.common;
 
 import com.payneteasy.tlv.HexUtil;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -22,7 +21,7 @@ public class MessagesContainerTest {
         assertFalse(messages.isEmpty());
         ByteArrayOutputStream out = new ByteArrayOutputStream(10);
         messages.writeToOutput(out);
-        Assert.assertEquals("[2] :  01 02", HexUtil.toFormattedHexString(out.toByteArray()));
+        assertEquals("[2] :  01 02", HexUtil.toFormattedHexString(out.toByteArray()));
     }
 
     @Test
@@ -35,7 +34,7 @@ public class MessagesContainerTest {
         assertFalse(messages.isEmpty());
         ByteArrayOutputStream out = new ByteArrayOutputStream(10);
         messages.writeToOutput(out);
-        Assert.assertEquals("[12] :  02 00 00 00  01 02 00 00  00 02 02 03", HexUtil.toFormattedHexString(out.toByteArray()));
+        assertEquals("[12] :  02 00 00 00  01 02 00 00  00 02 02 03", HexUtil.toFormattedHexString(out.toByteArray()));
     }
 
     @Test
