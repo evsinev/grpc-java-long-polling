@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
+import java.io.IOException;
+import java.net.URL;
 
 public class SimpleJettyServer {
 
@@ -43,6 +45,10 @@ public class SimpleJettyServer {
 
     public ManagedChannel createClientChannel() {
         return LongPollingChannelBuilder.forTarget("http://localhost:9096/test").build();
+    }
+
+    public SimpleHttpClient createHttpClient() throws IOException {
+        return new SimpleHttpClient(new URL("http://localhost:9096/test"));
     }
 
     public void start() {

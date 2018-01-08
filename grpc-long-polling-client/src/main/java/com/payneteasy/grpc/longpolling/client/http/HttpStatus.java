@@ -27,9 +27,9 @@ public class HttpStatus {
 
     @Override
     public String toString() {
-        return "HttpStatus{" +
-                "code=" + code +
-                ", message='" + message + '\'' +
-                '}';
+        return "HttpStatus{"
+                + "code=" + code
+                + ", message='" + message + '\''
+                + '}';
     }
 }

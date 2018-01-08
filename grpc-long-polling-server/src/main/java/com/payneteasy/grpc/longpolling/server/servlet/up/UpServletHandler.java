@@ -1,9 +1,10 @@
 package com.payneteasy.grpc.longpolling.server.servlet.up;
 
 import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
-import com.payneteasy.grpc.longpolling.server.servlet.ITransportRegistry;
 import com.payneteasy.grpc.longpolling.server.servlet.MethodCall;
-import com.payneteasy.grpc.longpolling.server.servlet.TransportHolder;
+import com.payneteasy.grpc.longpolling.server.servlet.registry.ITransportRegistry;
+import com.payneteasy.grpc.longpolling.server.servlet.registry.StreamHolder;
+import com.payneteasy.grpc.longpolling.server.servlet.registry.TransportHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,16 +23,15 @@ public class UpServletHandler {
         transportRegistry = aRegistry;
     }
 
-
     public void handle(HttpServletRequest aRequest, MethodCall aMethod) throws IOException {
         LOG.debug("Finding 'UP' transport: {}", aMethod.getStreamId().getTransportId());
-        TransportHolder transportHolder = transportRegistry.getOrCreateTransportListener(aMethod.getStreamId().getTransportId());
+        TransportHolder transportHolder = transportRegistry.findTransportHolder(aMethod.getStreamId().getTransportId());
 
         LOG.debug("Finding 'UP' stream   : {}", aMethod.getStreamId());
-
         SingleMessageProducer message = readFully(getClass(), aRequest.getInputStream());
 
-        UpServerStream stream = transportHolder.getOrCreateStream(aMethod.getStreamId(), aMethod.getMethod());
-        stream.sendToGrpc(message);
+        StreamHolder streamHolder = transportHolder.getOrCreateUpStream(aMethod.getStreamId(), aMethod.getMethod());
+        UpServerStream upStream = streamHolder.getUpStream();
+        upStream.sendToGrpc(message);
     }
 }

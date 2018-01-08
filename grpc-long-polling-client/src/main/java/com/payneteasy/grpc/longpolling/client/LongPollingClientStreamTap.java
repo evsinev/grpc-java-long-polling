@@ -50,13 +50,24 @@ public class LongPollingClientStreamTap extends AbstractClientStream {
         state = State.SENDING_TAP;
         slotSender = new SlotSender<>(LOG, aMessage -> listener.messagesAvailable(aMessage));
 
-        tapping = new HttpClientDelayedInit(aListener ->
-                new HttpClientExecutor(aExecutor, new HttpClientTapping(aListener, slotSender, aEndpoint))
-        );
-
         downloading = new HttpClientDelayedInit(aListener ->
                 new HttpClientExecutor(aExecutor, new HttpClientDownloading(aEndpoint, aTransportActive, slotSender, listener))
         );
+
+        HttpClientTapping.IOnCompleteAction onCompleteAction = aMessage -> {
+            if(aMessage.isEmpty())  {
+                downloading.sendMessage(EMPTY_INPUT);
+            } else {
+                for (InputStream inputStream : aMessage.getInputs()) {
+                    slotSender.onSendMessage(SingleMessageProducer.readFully(getClass(), inputStream));
+                }
+            }
+        };
+
+        tapping = new HttpClientDelayedInit(aListener ->
+                new HttpClientExecutor(aExecutor, new HttpClientTapping(aListener, aEndpoint, onCompleteAction))
+        );
+
     }
 
     @Override

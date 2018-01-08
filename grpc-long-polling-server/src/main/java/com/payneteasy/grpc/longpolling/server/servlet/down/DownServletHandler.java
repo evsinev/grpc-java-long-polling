@@ -1,9 +1,10 @@
 package com.payneteasy.grpc.longpolling.server.servlet.down;
 
 import com.payneteasy.grpc.longpolling.common.MessagesContainer;
-import com.payneteasy.grpc.longpolling.server.servlet.ITransportRegistry;
 import com.payneteasy.grpc.longpolling.server.servlet.MethodCall;
-import com.payneteasy.grpc.longpolling.server.servlet.TransportHolder;
+import com.payneteasy.grpc.longpolling.server.servlet.registry.ITransportRegistry;
+import com.payneteasy.grpc.longpolling.server.servlet.registry.StreamHolder;
+import com.payneteasy.grpc.longpolling.server.servlet.registry.TransportHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,24 +21,21 @@ public class DownServletHandler {
         this.registry = registry;
     }
 
-    public void handle(MethodCall aMethod, HttpServletResponse aResponse) throws IOException {
-        try {
-            LOG.debug("Waiting for new messages ...");
-            TransportHolder holder = registry.getReadyMessages(aMethod.getStreamId(), aMethod.getMethod());
-            if(holder.isActive()) {
-                MessagesContainer messages = holder.getMessages(180_000);
-                // todo use async servlet for waiting messages
-                if(!messages.isEmpty()) {
-                    LOG.debug("Write messages ...");
-                    messages.writeToOutput(aResponse.getOutputStream());
-                } else {
-                    LOG.debug("No messages");
-                }
+    // todo use async servlet for waiting messages
+    public void handle(MethodCall aMethod, HttpServletResponse aResponse) throws IOException, InterruptedException {
+        LOG.debug("Waiting for new messages ...");
+        TransportHolder transportHolder = registry.findTransportHolder(aMethod.getStreamId().getTransportId());
+        if(transportHolder.isActive()) {
+            StreamHolder      streamHolder = transportHolder.getOrCreateUpStream(aMethod.getStreamId(), aMethod.getMethod());
+            MessagesContainer messages     = streamHolder.awaitMessages(180_000);
+            if(!messages.isEmpty()) {
+                LOG.debug("Write messages ...");
+                messages.writeToOutput(aResponse.getOutputStream());
             } else {
-                aResponse.sendError(HttpServletResponse.SC_GONE);
+                LOG.debug("No messages");
             }
-        } catch (InterruptedException e) {
-            LOG.error("Interrupted", e);
+        } else {
+            aResponse.sendError(HttpServletResponse.SC_GONE);
         }
     }
 }

@@ -6,24 +6,22 @@ import io.grpc.examples.serverstreaming.ServerStreamingGreeterGrpc;
 import io.grpc.examples.serverstreaming.TapHelloReply;
 import io.grpc.examples.serverstreaming.TapHelloRequest;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class ServerStreamingClientServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerStreamingClientServerTest.class);
 
 
-    @Test(timeout = 30_000)
-    @Ignore
+    @Test(timeout = 10_000)
     public void test() throws InterruptedException {
-        AtomicReference<TapHelloRequest> requestRef = new AtomicReference<>();
-        SimpleJettyServer jettyServer = new SimpleJettyServer(9096, new ServerStreamingServiceImpl(requestRef));
+        ArrayBlockingQueue<TapHelloRequest> queue = new ArrayBlockingQueue<>(1, true);
+        SimpleJettyServer jettyServer = new SimpleJettyServer(9096, new ServerStreamingServiceImpl(queue));
         jettyServer.start();
         try {
             ManagedChannel clientChannel = jettyServer.createClientChannel();

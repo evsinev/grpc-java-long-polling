@@ -1,8 +1,6 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
 import com.payneteasy.grpc.longpolling.common.MessagesContainer;
-import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
-import com.payneteasy.grpc.longpolling.common.SlotSender;
 import com.payneteasy.tlv.HexUtil;
 import io.grpc.Drainable;
 import io.grpc.internal.IoUtils;
@@ -18,9 +16,11 @@ public class HttpConnection {
 
     private final Logger            log;
     private final HttpURLConnection connection;
+    private final URL               url;
 
     public HttpConnection(Logger aLogger, URL aUrl) throws IOException {
         log        = aLogger;
+        url        = aUrl;
         connection = (HttpURLConnection) aUrl.openConnection();
     }
 
@@ -28,15 +28,13 @@ public class HttpConnection {
 //        new Streams(log).messageAvailable(aListener, connection);
 //    }
 
-    public void fireMessagesContainerAvailable(SlotSender<SingleMessageProducer> aSlotSender) throws IOException {
-        MessagesContainer messages = MessagesContainer.parse(connection.getInputStream());
-        for (InputStream inputStream : messages.getInputs()) {
-            aSlotSender.onSendMessage(SingleMessageProducer.readFully(getClass(), inputStream));
-        }
-
+    public MessagesContainer readMessagesContainer() throws IOException {
+        log.debug("Reading for output from server ...");
+        return MessagesContainer.parse(connection.getInputStream());
     }
 
     public HttpStatus doPost(InputStream aInputStream) throws IOException {
+        log.debug("Sending POST to {} ...", url);
         connection.setDoInput(true);
         connection.setDoOutput(true);
         connection.connect();

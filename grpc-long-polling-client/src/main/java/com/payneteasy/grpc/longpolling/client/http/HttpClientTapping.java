@@ -1,14 +1,14 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
 import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
+import com.payneteasy.grpc.longpolling.common.MessagesContainer;
 import com.payneteasy.grpc.longpolling.common.MethodDirection;
-import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
-import com.payneteasy.grpc.longpolling.common.SlotSender;
 import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -18,12 +18,16 @@ public class HttpClientTapping implements IHttpClient {
 
     private final ClientStreamListener              listener;
     private final URL                               url;
-    private final SlotSender<SingleMessageProducer> slotSender;
+    private final IOnCompleteAction                 onCompleteAction;
 
-    public HttpClientTapping(ClientStreamListener aListener, SlotSender<SingleMessageProducer> aSlotSender, ServerEndPoint aEndpoint) {
-        listener   = aListener;
-        url        = aEndpoint.createUrl(MethodDirection.TAP);
-        slotSender = aSlotSender;
+    public interface IOnCompleteAction {
+        void onComplete(MessagesContainer messages) throws IOException;
+    }
+
+    public HttpClientTapping(ClientStreamListener aListener, ServerEndPoint aEndpoint, IOnCompleteAction aOnCompleteAction) {
+        listener         = aListener;
+        url              = aEndpoint.createUrl(MethodDirection.TAP);
+        onCompleteAction = aOnCompleteAction;
     }
 
     @Override
@@ -38,7 +42,7 @@ public class HttpClientTapping implements IHttpClient {
                 return;
             }
 
-            http.fireMessagesContainerAvailable(slotSender);
+            onCompleteAction.onComplete(http.readMessagesContainer());
         });
     }
 

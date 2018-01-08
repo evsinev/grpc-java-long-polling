@@ -33,7 +33,7 @@ public class ServerStreamingClientTest {
         SimpleJettyServer jettyServer = new SimpleJettyServer(9096, new HttpServlet() {
             @Override
             protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+                LOG.debug("URL {} ", req.getRequestURI());
                 byte[] bytes = IoUtils.toByteArray(req.getInputStream());
                 requestHex.set(HexUtil.toFormattedHexString(bytes));
 
