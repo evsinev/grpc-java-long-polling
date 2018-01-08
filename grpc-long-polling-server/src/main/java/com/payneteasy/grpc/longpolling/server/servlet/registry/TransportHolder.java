@@ -1,6 +1,7 @@
 package com.payneteasy.grpc.longpolling.server.servlet.registry;
 
 import com.payneteasy.grpc.longpolling.common.StreamId;
+import com.payneteasy.grpc.longpolling.common.TransportId;
 import com.payneteasy.grpc.longpolling.server.servlet.up.UpServerStream;
 import io.grpc.Attributes;
 import io.grpc.Metadata;
@@ -8,22 +9,32 @@ import io.grpc.internal.ServerTransportListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TransportHolder {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransportHolder.class);
 
-    private volatile boolean                         transportEnabled;
+    private volatile AtomicReference<TransportState> transportState;
+    private volatile long                            lastAccessTime;
 
     private final    ServerTransportListener         listener;
     private final    Map<StreamId, StreamHolder>     streams;
+    private final    TransportId                     transportId;
 
-    public TransportHolder(ServerTransportListener aListener) {
+    private enum TransportState {
+          IDLE
+        , ACTIVE
+    }
+
+    public TransportHolder(ServerTransportListener aListener, TransportId aId) {
         listener         = aListener;
         streams          = new ConcurrentHashMap<>();
-        transportEnabled = true;
+        transportState   = new AtomicReference<>(TransportState.IDLE);
+        transportId      = aId;
     }
 
     public StreamHolder getOrCreateUpStream(StreamId aMethodStreamId, String aMethod) {
@@ -35,11 +46,13 @@ public class TransportHolder {
             , UpServerStream.IActionAfterMessageAvailable aActionAfterMessageAvailable) {
         return streams.computeIfAbsent(aMethodStreamId, id -> {
             LOG.debug("Creating 'UP' stream {}", id);
-            MessagesHolder messagesHolder = new MessagesHolder();
-            UpServerStream upStream = new UpServerStream(this, messagesHolder, aActionAfterMessageAvailable);
+            MessagesHolder messagesHolder = new MessagesHolder(aMethodStreamId);
+            UpServerStream upStream = new UpServerStream(messagesHolder, aActionAfterMessageAvailable);
             listener.streamCreated(upStream, aMethod, new Metadata());
-            listener.transportReady(Attributes.EMPTY);
-            return new StreamHolder(upStream, messagesHolder);
+            if(transportState.compareAndSet(TransportState.IDLE, TransportState.ACTIVE)) {
+                listener.transportReady(Attributes.EMPTY);
+            }
+            return new StreamHolder(upStream, messagesHolder, aMethodStreamId);
         });
     }
 
@@ -50,17 +63,38 @@ public class TransportHolder {
         });
     }
 
-    public void markAsDisabled() {
-        transportEnabled = false;
-    }
-
     public boolean isActive() {
         for (StreamHolder streamHolder : streams.values()) {
-            if(streamHolder.hasMessages()) {
+            if(streamHolder.isActive() ) {
                 return true;
             }
         }
-        return transportEnabled;
+        return transportState.get() == TransportState.IDLE;
     }
 
+    public void updateAccessTime() {
+        lastAccessTime = System.currentTimeMillis();
+    }
+
+    public long getLastAccessTime() {
+        return lastAccessTime;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (StreamHolder streamHolder : streams.values()) {
+            if(streamHolder.hasMessages()) {
+                sb.append(streamHolder);
+                sb.append(", ");
+            }
+        }
+        return "TransportHolder{"
+                + "  " + transportId
+                + ", streams=" + streams.size()
+                + ", state=" + transportState
+                + ", lastAccessTime=" + new Date(lastAccessTime)
+                + ", steamsWithMessages=" + sb
+                ;
+    }
 }

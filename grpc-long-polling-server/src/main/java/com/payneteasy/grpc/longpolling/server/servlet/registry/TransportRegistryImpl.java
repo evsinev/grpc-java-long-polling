@@ -25,10 +25,25 @@ public class TransportRegistryImpl implements ITransportRegistry {
 
     @Override
     public TransportHolder findTransportHolder(TransportId transportId) {
-        return transports.computeIfAbsent(transportId, id -> {
+        TransportHolder transportHolder = transports.computeIfAbsent(transportId, id -> {
             LOG.debug("Creating new TransportHolder for {}", id);
-            return new TransportHolder(listener.transportCreated(serverTransport));
+            return new TransportHolder(listener.transportCreated(serverTransport), id);
         });
+        transportHolder.updateAccessTime();
+        return transportHolder;
     }
 
+    @Override
+    public void cleanInactiveTransports() {
+        LOG.debug("Inspecting {} transports...", transports.size());
+        transports.values().removeIf(transportHolder -> {
+            if(!transportHolder.isActive() || transportHolder.getLastAccessTime() > System.currentTimeMillis() + 600_000) {
+                LOG.debug("Removing {} ...", transportHolder);
+                return true;
+            } else {
+                LOG.debug("Active: {}", transportHolder);
+                return false;
+            }
+        });
+    }
 }

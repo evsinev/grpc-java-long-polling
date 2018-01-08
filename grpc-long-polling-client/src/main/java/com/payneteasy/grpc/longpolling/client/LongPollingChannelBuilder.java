@@ -13,14 +13,16 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.SocketAddress;
 import java.net.URL;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ExecutorService;
+
+import static io.grpc.internal.GrpcUtil.getThreadFactory;
+import static java.util.concurrent.Executors.newCachedThreadPool;
 
 public class LongPollingChannelBuilder extends AbstractManagedChannelImplBuilder<LongPollingChannelBuilder> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LongPollingChannelBuilder.class);
 
-    private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(10);
+    private static final ExecutorService EXECUTOR = newCachedThreadPool(getThreadFactory("long-polling-%d", true));
 
     private final URL baseUrl;
 
@@ -61,4 +63,9 @@ public class LongPollingChannelBuilder extends AbstractManagedChannelImplBuilder
         LOG.trace("usePlaintext ({})", skipNegotiation);
         return this;
     }
+
+//    public LongPollingChannelBuilder setScheduledThreadPoolSize(int aScheduledThreadPoolSize) {
+//        scheduledThreadPoolSize = aScheduledThreadPoolSize;
+//        return this;
+//    }
 }

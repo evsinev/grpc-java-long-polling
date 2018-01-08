@@ -23,19 +23,21 @@ public class DownServletHandler {
 
     // todo use async servlet for waiting messages
     public void handle(MethodCall aMethod, HttpServletResponse aResponse) throws IOException, InterruptedException {
-        LOG.debug("Waiting for new messages ...");
         TransportHolder transportHolder = registry.findTransportHolder(aMethod.getStreamId().getTransportId());
-        if(transportHolder.isActive()) {
-            StreamHolder      streamHolder = transportHolder.getOrCreateUpStream(aMethod.getStreamId(), aMethod.getMethod());
-            MessagesContainer messages     = streamHolder.awaitMessages(180_000);
+        StreamHolder      streamHolder = transportHolder.getOrCreateUpStream(aMethod.getStreamId(), aMethod.getMethod());
+
+        if(streamHolder.isActive()) {
+            MessagesContainer messages = streamHolder.awaitMessages(60_000);
             if(!messages.isEmpty()) {
-                LOG.debug("Write messages ...");
+                LOG.debug("{}: Write messages ...", aMethod.getStreamId());
                 messages.writeToOutput(aResponse.getOutputStream());
             } else {
-                LOG.debug("No messages");
+                LOG.debug("{}: No messages", aMethod.getStreamId());
             }
         } else {
+            LOG.debug("{}: Stream is inactive. Sending SC_GONE ...", aMethod.getStreamId());
             aResponse.sendError(HttpServletResponse.SC_GONE);
         }
+
     }
 }

@@ -4,7 +4,6 @@ import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
 import com.payneteasy.grpc.longpolling.common.SlotSender;
 import com.payneteasy.grpc.longpolling.server.base.AbstractNoopServerStream;
 import com.payneteasy.grpc.longpolling.server.servlet.registry.MessagesHolder;
-import com.payneteasy.grpc.longpolling.server.servlet.registry.TransportHolder;
 import io.grpc.KnownLength;
 import io.grpc.Metadata;
 import io.grpc.Status;
@@ -22,15 +21,13 @@ public class UpServerStream extends AbstractNoopServerStream {
 
     private final    SlotSender<SingleMessageProducer> slotSender;
     private final    MessagesHolder                    messages;
-    private final    TransportHolder                   transportHolder;
 
     public interface IActionAfterMessageAvailable {
         void process(ServerStreamListener aListener);
     }
 
-    public UpServerStream(TransportHolder aTransportHolder, MessagesHolder aMessages, IActionAfterMessageAvailable aActionAfterMessageAvailable) {
+    public UpServerStream(MessagesHolder aMessages, IActionAfterMessageAvailable aActionAfterMessageAvailable) {
         super(LOG);
-        transportHolder   = aTransportHolder;
         slotSender        = new SlotSender<>(LOG, aMessage -> {
             listener.messagesAvailable(aMessage);
             aActionAfterMessageAvailable.process(listener);
@@ -46,15 +43,15 @@ public class UpServerStream extends AbstractNoopServerStream {
     @Override
     public void close(Status status, Metadata trailers) {
         if(status != Status.OK) {
-            LOG.warn("Transport closed: {}, {}", status, trailers);
+            LOG.warn("Stream closed: {}, {}", status, trailers);
         }
-        transportHolder.markAsDisabled();
+        messages.markAsDisabled();
     }
 
     @Override
     public void cancel(Status status) {
         LOG.trace("cancel({})", status);
-        transportHolder.markAsDisabled();
+        messages.markAsDisabled();
     }
 
     @Override

@@ -67,4 +67,13 @@ public class SimpleJettyServer {
             throw new IllegalStateException(e);
         }
     }
+
+    public void startAndJoin() {
+        try {
+            server.start();
+            server.join();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 }

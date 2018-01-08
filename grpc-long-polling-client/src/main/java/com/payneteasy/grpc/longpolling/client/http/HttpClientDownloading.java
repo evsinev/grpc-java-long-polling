@@ -54,7 +54,7 @@ public class HttpClientDownloading implements IHttpClient {
                 
                 int status = connection.getResponseCode();
                 if(status == 410) { // transport is inactive
-                    LOG.warn("Transport is inactive on server side for stream {}", streamId);
+                    LOG.warn("{} Stream is inactive on server side", streamId);
                     listener.closed(Status.OK, new Metadata());
                     return;
                 }

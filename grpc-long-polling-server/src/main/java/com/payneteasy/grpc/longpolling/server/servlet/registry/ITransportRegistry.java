@@ -6,4 +6,5 @@ public interface ITransportRegistry {
 
     TransportHolder findTransportHolder(TransportId transportId);
 
+    void cleanInactiveTransports();
 }
