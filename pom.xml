@@ -35,8 +35,8 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git@github.com/evsinev/grpc-java-long-polling.git</connection>
-        <developerConnection>scm:git:git@github.com/evsinev/grpc-java-long-polling.git</developerConnection>
+        <connection>scm:git:git@github.com:evsinev/grpc-java-long-polling.git</connection>
+        <developerConnection>scm:git:git@github.com:evsinev/grpc-java-long-polling.git</developerConnection>
         <url>https://github.com/evsinev/grpc-java-long-polling.git</url>
     </scm>
 
