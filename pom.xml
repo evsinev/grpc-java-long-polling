@@ -4,7 +4,7 @@
 
     <artifactId>grpc-long-polling</artifactId>
     <groupId>com.payneteasy</groupId>
-    <version>1.0-2-SNAPSHOT</version>
+    <version>1.0-3-SNAPSHOT</version>
 
     <name>gRPC long polling ${project.version}</name>
 
@@ -39,14 +39,45 @@
         <url>https://github.com/evsinev/grpc-java-long-polling.git</url>
   </scm>
 
+    <!--
+        -      Distributions
+        -->
     <distributionManagement>
+
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>sonatype oss RELEASE repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>sonatype oss SNAPSHOT repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+
         <site>
             <id>local-site</id>
             <name>Store only on local disk</name>
-            <url>file:///tmp/paynet-3-site</url>
+            <url>file:///tmp/mysql-scheduler-site</url>
         </site>
     </distributionManagement>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>esinev</id>
+            <email>esinev@gmail.com</email>
+        </developer>
+    </developers>
 
     <dependencyManagement>
         <dependencies>
@@ -262,5 +293,38 @@
             
         </plugins>
     </build>
+
+    <!-- signs artifacts. This profile will be activated when the value of maven property performRelease is true -->
+    <profiles>
+        <profile>
+            <id>release-profile</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+
+                    <!-- SIGNS -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
