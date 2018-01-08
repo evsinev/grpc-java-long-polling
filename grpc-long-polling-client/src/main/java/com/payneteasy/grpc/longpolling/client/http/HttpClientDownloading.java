@@ -49,7 +49,7 @@ public class HttpClientDownloading implements IHttpClient {
 
     @Override
     public void sendMessage(InputStream aInputStream) {
-        if (active && transportActive.get()) {
+        while (active && transportActive.get()) {
             try {
                 LOG.debug("Sending to {} ...", sendUrl);
 
@@ -70,8 +70,11 @@ public class HttpClientDownloading implements IHttpClient {
                 }
 
                 MessagesContainer messages = MessagesContainer.parse(connection.getInputStream());
-                for (InputStream inputStream : messages.getInputs()) {
-                    slotSender.onSendMessage(SingleMessageProducer.readFully(getClass(), inputStream));
+                if(!messages.isEmpty()) {
+                    for (InputStream inputStream : messages.getInputs()) {
+                        slotSender.onSendMessage(SingleMessageProducer.readFully(getClass(), inputStream));
+                    }
+                    return;
                 }
 
             } catch (FileNotFoundException e) {
@@ -85,8 +88,6 @@ public class HttpClientDownloading implements IHttpClient {
             } catch (IOException e) {
                 fireError(Status.DATA_LOSS, e, "IO error");
             }
-        } else {
-            LOG.warn("Transport is inactive on client side for stream {} [active={}, transportActive{}]", streamId, active, transportActive);
         }
 
     }

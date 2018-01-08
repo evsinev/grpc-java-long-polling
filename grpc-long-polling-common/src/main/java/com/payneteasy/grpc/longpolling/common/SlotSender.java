@@ -12,6 +12,10 @@ public class SlotSender<T> {
     private final    SendFunction<T>             sendFunction;
     private final    Logger                      logger;
 
+    public boolean hasSlots() {
+        return slots.size() > 0;
+    }
+
     public interface SendFunction<T> {
         void sendMessage(T aMessage);
     }

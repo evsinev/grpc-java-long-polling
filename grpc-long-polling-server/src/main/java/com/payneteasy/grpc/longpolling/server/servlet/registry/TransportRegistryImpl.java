@@ -37,7 +37,7 @@ public class TransportRegistryImpl implements ITransportRegistry {
     public void cleanInactiveTransports() {
         LOG.debug("Inspecting {} transports...", transports.size());
         transports.values().removeIf(transportHolder -> {
-            if(!transportHolder.isActive() || transportHolder.getLastAccessTime() > System.currentTimeMillis() + 600_000) {
+            if(!transportHolder.isActive() || transportHolder.getLastAccessTime() < System.currentTimeMillis() - 600_000) {
                 LOG.debug("Removing {} ...", transportHolder);
                 return true;
             } else {

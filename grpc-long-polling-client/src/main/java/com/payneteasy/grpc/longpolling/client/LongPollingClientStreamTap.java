@@ -7,6 +7,7 @@ import com.payneteasy.grpc.longpolling.client.http.HttpClientTapping;
 import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
 import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
 import com.payneteasy.grpc.longpolling.common.SlotSender;
+import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
 import org.slf4j.Logger;
@@ -60,6 +61,9 @@ public class LongPollingClientStreamTap extends AbstractClientStream {
             } else {
                 for (InputStream inputStream : aMessage.getInputs()) {
                     slotSender.onSendMessage(SingleMessageProducer.readFully(getClass(), inputStream));
+                    if(slotSender.hasSlots()) {
+                        downloading.sendMessage(EMPTY_INPUT);
+                    }
                 }
             }
         };
@@ -73,7 +77,9 @@ public class LongPollingClientStreamTap extends AbstractClientStream {
     @Override
     public void cancel(Status aReason) {
         LOG.trace("cancel({})", aReason);
-
+        tapping.cancelStream(aReason);
+        downloading.cancelStream(aReason);
+        listener.closed(aReason, new Metadata());
     }
 
     @Override
@@ -89,8 +95,10 @@ public class LongPollingClientStreamTap extends AbstractClientStream {
         LOG.trace("request({})", aCount);
         slotSender.onRequest(aCount);
         if(state == State.SENDING_DOWN) {
+            LOG.debug("State is {}, getting new messages from server ...", state);
             downloading.sendMessage(EMPTY_INPUT);
         } else {
+            LOG.debug("State is {}. Waiting for tap response ...", state);
             state = State.SENDING_DOWN;
         }
     }
