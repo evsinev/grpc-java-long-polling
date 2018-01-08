@@ -4,7 +4,7 @@
 
     <artifactId>grpc-long-polling</artifactId>
     <groupId>com.payneteasy</groupId>
-    <version>1.0-3-SNAPSHOT</version>
+    <version>1.0-4-SNAPSHOT</version>
 
     <name>gRPC long polling ${project.version}</name>
 
@@ -37,6 +37,7 @@
         <connection>scm:git:git@github.com:evsinev/grpc-java-long-polling.git</connection>
         <developerConnection>scm:git:git@github.com:evsinev/grpc-java-long-polling.git</developerConnection>
         <url>https://github.com/evsinev/grpc-java-long-polling.git</url>
+        <tag>HEAD</tag>
   </scm>
 
     <!--
@@ -281,8 +282,6 @@
                             <encoding>UTF-8</encoding>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>
-                            <linkXRef>false</linkXRef>
-                            <enableRSS>false</enableRSS>
                         </configuration>
                         <goals>
                             <goal>check</goal>
@@ -307,6 +306,12 @@
             <build>
                 <plugins>
 
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>2.5.3</version>
+                    </plugin>
+                    
                     <!-- SIGNS -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
