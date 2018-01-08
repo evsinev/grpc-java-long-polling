@@ -51,7 +51,6 @@ public class LongPollingClientTransport implements ConnectionClientTransport {
     @Override
     public void shutdown(Status reason) {
         LOG.trace("shutdown({})", reason);
-        transportActive.set(false);
     }
 
     @Override
