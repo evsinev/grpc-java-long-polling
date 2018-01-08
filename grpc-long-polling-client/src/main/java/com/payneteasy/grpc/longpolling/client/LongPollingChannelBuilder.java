@@ -1,5 +1,6 @@
 package com.payneteasy.grpc.longpolling.client;
 
+import com.payneteasy.grpc.longpolling.client.util.ConnectionOptions;
 import com.payneteasy.grpc.longpolling.common.TransportId;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.internal.AbstractManagedChannelImplBuilder;
@@ -24,7 +25,9 @@ public class LongPollingChannelBuilder extends AbstractManagedChannelImplBuilder
 
     private static final ExecutorService EXECUTOR = newCachedThreadPool(getThreadFactory("long-polling-%d", true));
 
-    private final URL baseUrl;
+    private final URL  baseUrl;
+    private       long connectionTimeout      = 60_000;
+    private       long readTimeout            = 120_000;
 
     public LongPollingChannelBuilder(InetSocketAddress aAddress, URL aBaseUrl) {
         super(aAddress, getAuthorityFromAddress(aAddress));
@@ -55,7 +58,7 @@ public class LongPollingChannelBuilder extends AbstractManagedChannelImplBuilder
     @Override
     protected ClientTransportFactory buildTransportFactory() {
         LOG.trace("buildTransportFactory()");
-        return new LongPollingClientTransportFactory(EXECUTOR, TransportId.generateNew(), baseUrl);
+        return new LongPollingClientTransportFactory(EXECUTOR, TransportId.generateNew(), new ConnectionOptions(baseUrl, connectionTimeout, readTimeout));
     }
 
     @Override
@@ -64,8 +67,14 @@ public class LongPollingChannelBuilder extends AbstractManagedChannelImplBuilder
         return this;
     }
 
-//    public LongPollingChannelBuilder setScheduledThreadPoolSize(int aScheduledThreadPoolSize) {
-//        scheduledThreadPoolSize = aScheduledThreadPoolSize;
-//        return this;
-//    }
+    public LongPollingChannelBuilder setConnectionTimeout(int aConnectionTimeout) {
+        connectionTimeout = aConnectionTimeout;
+        return this;
+    }
+
+    public LongPollingChannelBuilder setReadTimeout(int aReadTimeout) {
+        readTimeout = aReadTimeout;
+        return this;
+    }
+
 }

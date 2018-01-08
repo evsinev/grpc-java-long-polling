@@ -1,6 +1,7 @@
 package com.payneteasy.grpc.longpolling.client;
 
 import com.google.common.util.concurrent.SettableFuture;
+import com.payneteasy.grpc.longpolling.client.util.ConnectionOptions;
 import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
 import com.payneteasy.grpc.longpolling.common.TransportId;
 import io.grpc.*;
@@ -12,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.net.URL;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -25,12 +25,12 @@ public class LongPollingClientTransport implements ConnectionClientTransport {
     private final LogId logId = LogId.allocate(getClass().getName());
 
     private final TransportId transportId;
-    private final URL baseUrl;
+    private final ConnectionOptions connectionFactory;
     private final ExecutorService executor;
     private final AtomicBoolean   transportActive = new AtomicBoolean(true);
 
-    public LongPollingClientTransport(ExecutorService aExecutor, URL aBaseUrl, TransportId aId) {
-        baseUrl = aBaseUrl;
+    public LongPollingClientTransport(ExecutorService aExecutor, ConnectionOptions aConnectionFactory, TransportId aId) {
+        connectionFactory = aConnectionFactory;
         transportId = aId;
         executor = aExecutor;
     }
@@ -64,7 +64,7 @@ public class LongPollingClientTransport implements ConnectionClientTransport {
     public ClientStream newStream(MethodDescriptor<?, ?> method, Metadata headers, CallOptions callOptions) {
         LOG.trace("newStream({}, {}, {}, {})", method.getFullMethodName(), method.getType(), headers, callOptions);
 
-        ServerEndPoint endPoint = new ServerEndPoint(baseUrl, transportId.generateNextStreamId(), method);
+        ServerEndPoint endPoint = new ServerEndPoint(connectionFactory, transportId.generateNextStreamId(), method);
 
         switch (method.getType()) {
             case UNARY:

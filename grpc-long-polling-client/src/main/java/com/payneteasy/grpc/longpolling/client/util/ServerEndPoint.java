@@ -8,23 +8,27 @@ import java.net.URL;
 
 public class ServerEndPoint {
 
-    private final URL                    baseUrl;
+    private final ConnectionOptions      connectionOptions;
     private final StreamId               streamId;
     private final MethodDescriptor<?, ?> method;
 
-    public ServerEndPoint(URL aBaseUrl, StreamId streamId, MethodDescriptor<?, ?> method) {
-        this.baseUrl = aBaseUrl;
+    public ServerEndPoint(ConnectionOptions aConnectionFactory, StreamId streamId, MethodDescriptor<?, ?> method) {
+        connectionOptions = aConnectionFactory;
         this.streamId = streamId;
         this.method = method;
     }
 
     public URL createUrl(MethodDirection aDirection) {
-        return Urls.appendPaths(baseUrl
+        return Urls.appendPaths(connectionOptions.getBaseUrl()
                 , method.getFullMethodName()
                 , aDirection
                 , streamId.getTransportId().getTransportId()
                 , streamId.getStreamId()
         );
+    }
+
+    public ConnectionOptions getConnectionOptions() {
+        return connectionOptions;
     }
 
     public StreamId getStreamId() {

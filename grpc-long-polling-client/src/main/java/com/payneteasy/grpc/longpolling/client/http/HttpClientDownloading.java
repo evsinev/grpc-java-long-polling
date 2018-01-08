@@ -1,5 +1,6 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
+import com.payneteasy.grpc.longpolling.client.util.ConnectionOptions;
 import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
 import com.payneteasy.grpc.longpolling.common.*;
 import io.grpc.Metadata;
@@ -30,17 +31,20 @@ public class HttpClientDownloading implements IHttpClient {
     private final    URL                               sendUrl;
     private final    SlotSender<SingleMessageProducer> slotSender;
     private final    StreamId                          streamId;
+    private final    ConnectionOptions                 connectionOptions;
 
     public HttpClientDownloading(ServerEndPoint aEndpoint
-            , AtomicBoolean aTransportActive, SlotSender<SingleMessageProducer> aSlotSender
+            , AtomicBoolean aTransportActive
+            , SlotSender<SingleMessageProducer> aSlotSender
             , ClientStreamListener aListener
     ) {
-        slotSender      = aSlotSender;
-        transportActive = aTransportActive;
-        streamId        = aEndpoint.getStreamId();
-        listener        = aListener;
-        active          = true;
-        sendUrl         = aEndpoint.createUrl(MethodDirection.DOWN);
+        connectionOptions = aEndpoint.getConnectionOptions();
+        slotSender        = aSlotSender;
+        transportActive   = aTransportActive;
+        streamId          = aEndpoint.getStreamId();
+        listener          = aListener;
+        active            = true;
+        sendUrl           = aEndpoint.createUrl(MethodDirection.DOWN);
     }
 
     @Override
@@ -51,6 +55,7 @@ public class HttpClientDownloading implements IHttpClient {
 
                 HttpURLConnection connection = (HttpURLConnection) sendUrl.openConnection();
                 connection.connect();
+                connectionOptions.configure(connection);
                 
                 int status = connection.getResponseCode();
                 if(status == 410) { // transport is inactive

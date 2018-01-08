@@ -23,7 +23,7 @@ public class ServerEndPointTest {
                 .setResponseMarshaller(marshaller)
                 .build();
 
-        ServerEndPoint endPoint = new ServerEndPoint(new URL("http://localhost"), StreamId.parse("1", "2"), descriptor);
+        ServerEndPoint endPoint = new ServerEndPoint(new ConnectionOptions(new URL("http://localhost"), 10, 10), StreamId.parse("1", "2"), descriptor);
         assertEquals("http://localhost/class/Method/UP/1/2", endPoint.createUrl(MethodDirection.UP).toString());
         assertEquals(StreamId.parse("1", "2"), endPoint.getStreamId());
     }

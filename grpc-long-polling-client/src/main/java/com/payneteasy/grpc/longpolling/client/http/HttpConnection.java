@@ -1,5 +1,6 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
+import com.payneteasy.grpc.longpolling.client.util.ConnectionOptions;
 import com.payneteasy.grpc.longpolling.common.MessagesContainer;
 import com.payneteasy.tlv.HexUtil;
 import io.grpc.Drainable;
@@ -18,10 +19,11 @@ public class HttpConnection {
     private final HttpURLConnection connection;
     private final URL               url;
 
-    public HttpConnection(Logger aLogger, URL aUrl) throws IOException {
+    public HttpConnection(Logger aLogger, URL aUrl, ConnectionOptions aOptions) throws IOException {
         log        = aLogger;
         url        = aUrl;
         connection = (HttpURLConnection) aUrl.openConnection();
+        aOptions.configure(connection);
     }
 
 //    public void fireMessageAvailable(ClientStreamListener aListener) throws IOException {

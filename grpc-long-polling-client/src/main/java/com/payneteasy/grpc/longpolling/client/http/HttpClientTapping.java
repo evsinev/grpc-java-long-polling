@@ -1,5 +1,6 @@
 package com.payneteasy.grpc.longpolling.client.http;
 
+import com.payneteasy.grpc.longpolling.client.util.ConnectionOptions;
 import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
 import com.payneteasy.grpc.longpolling.common.MessagesContainer;
 import com.payneteasy.grpc.longpolling.common.MethodDirection;
@@ -19,22 +20,24 @@ public class HttpClientTapping implements IHttpClient {
     private final ClientStreamListener              listener;
     private final URL                               url;
     private final IOnCompleteAction                 onCompleteAction;
+    private final ConnectionOptions                 connectionOptions;
 
     public interface IOnCompleteAction {
         void onComplete(MessagesContainer messages) throws IOException;
     }
 
     public HttpClientTapping(ClientStreamListener aListener, ServerEndPoint aEndpoint, IOnCompleteAction aOnCompleteAction) {
-        listener         = aListener;
-        url              = aEndpoint.createUrl(MethodDirection.TAP);
-        onCompleteAction = aOnCompleteAction;
+        connectionOptions = aEndpoint.getConnectionOptions();
+        listener          = aListener;
+        url               = aEndpoint.createUrl(MethodDirection.TAP);
+        onCompleteAction  = aOnCompleteAction;
     }
 
     @Override
     public void sendMessage(InputStream aInputStream) {
         ErrorsTranslator errors = new ErrorsTranslator(LOG, listener, url);
         errors.tryCatch(() -> {
-            HttpConnection http   = new HttpConnection(LOG, url);
+            HttpConnection http   = new HttpConnection(LOG, url, connectionOptions);
             HttpStatus     status = http.doPost(aInputStream);
 
             if(status.wasNotOk()) {
