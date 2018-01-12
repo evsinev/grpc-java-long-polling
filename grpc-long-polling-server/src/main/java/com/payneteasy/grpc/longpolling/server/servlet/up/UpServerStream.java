@@ -75,7 +75,7 @@ public class UpServerStream extends AbstractNoopServerStream {
                 throw new UncheckedIOException(e);
             }
         }
-        LOG.trace("writeMessage({} {})", size , aMessage);
+        LOG.trace("writeMessage({} {})", size, aMessage);
         messages.addMessage(aMessage);
     }
 

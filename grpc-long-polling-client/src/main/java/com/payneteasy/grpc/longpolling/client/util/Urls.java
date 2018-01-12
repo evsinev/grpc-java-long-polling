@@ -3,7 +3,7 @@ package com.payneteasy.grpc.longpolling.client.util;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Urls {
+public final class Urls {
 
     private Urls() {
     }

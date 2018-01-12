@@ -35,11 +35,6 @@ public class StreamingClientTest {
             @Override
             protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
                 LOG.debug("DOWN GET: {}", req.getRequestURI());
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 byte[] output = HexUtil.parseHex("01 0a06 7465 7374 2032");
                 resp.getOutputStream().write(output);
                 LOG.debug("DOWN WRITTEN: {}", HexUtil.toFormattedHexString(output));

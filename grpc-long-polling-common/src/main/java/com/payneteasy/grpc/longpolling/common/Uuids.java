@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 import java.util.UUID;
 
-public class Uuids {
+public final class Uuids {
 
     private Uuids() {
     }

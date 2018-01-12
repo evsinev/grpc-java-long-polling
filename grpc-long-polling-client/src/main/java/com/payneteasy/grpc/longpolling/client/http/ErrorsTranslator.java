@@ -17,7 +17,7 @@ public class ErrorsTranslator {
     private final URL url;
 
     public interface IConnectionAction {
-        void make() throws Exception;
+        void make() throws IOException;
     }
 
     public ErrorsTranslator(Logger aLog, ClientStreamListener aListener, URL aUrl) {
