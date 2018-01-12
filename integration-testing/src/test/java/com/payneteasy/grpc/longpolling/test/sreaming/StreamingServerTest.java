@@ -37,7 +37,6 @@ public class StreamingServerTest {
 
         send("UP", "0A 06 74 65  73 74 20 31");
         send("UP", "0A 06 74 65  73 74 20 31");
-        Thread.sleep(200);
         send("UP", "0A 06 74 65  73 74 20 31");
 
         Assert.assertTrue(latch.await(5, TimeUnit.SECONDS));

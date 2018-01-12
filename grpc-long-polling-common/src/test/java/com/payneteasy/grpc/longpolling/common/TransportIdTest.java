@@ -16,7 +16,8 @@ public class TransportIdTest {
         TransportId transportId = TransportId.generateNew();
         assertEquals(transportId.getTransportId(), parse(transportId.getTransportId()).getTransportId());
         assertNotEquals(T1, parse("2"));
-        assertEquals(T1, T1);
+        //noinspection EqualsWithItself
+        assertTrue(T1.equals(T1));
         String nullString = null;
         //noinspection ConstantConditions
         assertNotEquals(T1, nullString);
