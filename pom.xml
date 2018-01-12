@@ -314,6 +314,12 @@
                 </configuration>
             </plugin>
 
+        </plugins>
+    </build>
+
+    <reporting>
+        <plugins>
+            <!-- disable all reports for quick release -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -326,9 +332,8 @@
                     </reportSet>
                 </reportSets>
             </plugin>
-            
         </plugins>
-    </build>
+    </reporting>
 
     <!-- signs artifacts. This profile will be activated when the value of maven property performRelease is true -->
     <profiles>
