@@ -72,7 +72,7 @@ public class ErrorsTranslatorTest {
     @Test
     public void tryCatchInternal() throws Exception {
         errors.tryCatch(() -> {
-            throw new RuntimeException();
+            throw new IllegalStateException();
         });
         verify(listener).closed(eq(Status.INTERNAL), any(Metadata.class));
     }
