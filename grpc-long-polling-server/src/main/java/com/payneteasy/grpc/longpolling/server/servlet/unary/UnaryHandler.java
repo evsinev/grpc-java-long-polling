@@ -38,11 +38,16 @@ public class UnaryHandler {
 
         try {
             LOG.debug("Waiting while sending response to servlet output ...");
-            stream.waitDone(1, TimeUnit.MINUTES);
+            if(!stream.waitDone(1, TimeUnit.MINUTES)) {
+                LOG.error("No response from gRPC service");
+                aResponse.sendError(HttpServletResponse.SC_BAD_GATEWAY);
+            }
         } catch (InterruptedException e) {
             LOG.error("Cannot wait 1 min", e);
+            Thread.currentThread().interrupt();
+        } finally {
+            listener.transportTerminated();
+            LOG.debug("Transport {} terminated", aMethod.getStreamId().getTransportId());
         }
-        listener.transportTerminated();
-        LOG.debug("Transport {} terminated", aMethod.getStreamId().getTransportId());
     }
 }

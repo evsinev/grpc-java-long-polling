@@ -25,6 +25,7 @@ public class CleanupRegistryThread extends Thread {
 
             } catch (InterruptedException e) {
                 LOG.debug("Interrupted");
+                Thread.currentThread().interrupt();
                 return;
             }
         }

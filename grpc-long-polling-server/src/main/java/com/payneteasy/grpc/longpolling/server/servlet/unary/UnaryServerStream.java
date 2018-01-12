@@ -74,7 +74,7 @@ public class UnaryServerStream extends AbstractNoopServerStream {
         listener.halfClosed();
     }
 
-    public void waitDone(int aPeriod, TimeUnit aTimeUnit) throws InterruptedException {
-        latch.await(aPeriod, aTimeUnit);
+    public boolean waitDone(int aPeriod, TimeUnit aTimeUnit) throws InterruptedException {
+        return latch.await(aPeriod, aTimeUnit);
     }
 }
