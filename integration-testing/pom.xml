@@ -13,6 +13,20 @@
         <version>1.0-7-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <skipTests>true</skipTests>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>integration-test</id>
+            <properties>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
+    </profiles>
+    
     <dependencies>
 
         <dependency>
