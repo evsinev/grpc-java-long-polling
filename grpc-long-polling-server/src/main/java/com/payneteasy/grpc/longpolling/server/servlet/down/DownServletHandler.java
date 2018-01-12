@@ -2,6 +2,7 @@ package com.payneteasy.grpc.longpolling.server.servlet.down;
 
 import com.payneteasy.grpc.longpolling.common.MessagesContainer;
 import com.payneteasy.grpc.longpolling.server.servlet.MethodCall;
+import com.payneteasy.grpc.longpolling.server.servlet.ServletOptions;
 import com.payneteasy.grpc.longpolling.server.servlet.registry.ITransportRegistry;
 import com.payneteasy.grpc.longpolling.server.servlet.registry.StreamHolder;
 import com.payneteasy.grpc.longpolling.server.servlet.registry.TransportHolder;
@@ -16,9 +17,11 @@ public class DownServletHandler {
     private static final Logger LOG = LoggerFactory.getLogger(DownServletHandler.class);
 
     private final ITransportRegistry registry;
+    private final ServletOptions     options;
 
-    public DownServletHandler(ITransportRegistry registry) {
+    public DownServletHandler(ITransportRegistry registry, ServletOptions aOptions) {
         this.registry = registry;
+        options = aOptions;
     }
 
     // todo use async servlet for waiting messages
@@ -27,7 +30,7 @@ public class DownServletHandler {
         StreamHolder      streamHolder = transportHolder.getOrCreateUpStream(aMethod.getStreamId(), aMethod.getMethod());
 
         if(streamHolder.isActive()) {
-            MessagesContainer messages = streamHolder.awaitMessages(60_000);
+            MessagesContainer messages = streamHolder.awaitMessages(options.getReadTimeout());
             if(!messages.isEmpty()) {
                 LOG.debug("{}: Write messages ...", aMethod.getStreamId());
                 messages.writeToOutput(aResponse.getOutputStream());

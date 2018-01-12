@@ -2,6 +2,7 @@ package com.payneteasy.grpc.longpolling.server.servlet.unary;
 
 import com.payneteasy.grpc.longpolling.server.LongPollingServerTransport;
 import com.payneteasy.grpc.longpolling.server.servlet.MethodCall;
+import com.payneteasy.grpc.longpolling.server.servlet.ServletOptions;
 import io.grpc.Attributes;
 import io.grpc.Metadata;
 import io.grpc.internal.IoUtils;
@@ -19,17 +20,19 @@ public class UnaryHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(UnaryHandler.class);
 
-    private final ServerListener listener;
+    private final ServerListener             serverListener;
     private final LongPollingServerTransport serverTransport;
+    private final ServletOptions             options;
 
-    public UnaryHandler(ServerListener listener, LongPollingServerTransport aTransport) {
-        this.listener = listener;
+    public UnaryHandler(ServerListener aServerListener, LongPollingServerTransport aTransport, ServletOptions aOptions) {
+        serverListener  = aServerListener;
         serverTransport = aTransport;
+        options         = aOptions;
     }
 
     public void handle(HttpServletRequest aRequest, MethodCall aMethod, HttpServletResponse aResponse) throws IOException {
         LOG.debug("Creating unary transport and stream: {}", aMethod.getStreamId());
-        ServerTransportListener listener = this.listener.transportCreated(serverTransport);
+        ServerTransportListener listener = serverListener.transportCreated(serverTransport);
 
         byte[] buffer = IoUtils.toByteArray(aRequest.getInputStream());
         UnaryServerStream stream = new UnaryServerStream(buffer, aResponse, aMethod.getStreamId());
@@ -37,8 +40,8 @@ public class UnaryHandler {
         listener.transportReady(Attributes.EMPTY);
 
         try {
-            LOG.debug("Waiting while sending response to servlet output ...");
-            if(!stream.waitDone(1, TimeUnit.MINUTES)) {
+            LOG.debug("Waiting {} ms while sending response to servlet output ...", options.getReadTimeout());
+            if(!stream.waitDone(options.getReadTimeout(), TimeUnit.MILLISECONDS)) {
                 LOG.error("No response from gRPC service");
                 aResponse.sendError(HttpServletResponse.SC_BAD_GATEWAY);
             }

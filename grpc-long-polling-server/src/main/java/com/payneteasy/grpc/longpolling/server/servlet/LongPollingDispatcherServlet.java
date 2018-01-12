@@ -36,14 +36,18 @@ public class LongPollingDispatcherServlet extends HttpServlet {
 
 
     public LongPollingDispatcherServlet(ServerListener aListener) {
+        this(new ServletOptions(180_000), aListener);
+    }
+
+    public LongPollingDispatcherServlet(ServletOptions aOptions, ServerListener aListener) {
         Preconditions.checkNotNull(aListener, "ServerListener must not be null");
         LongPollingServerTransport serverTransport   = new LongPollingServerTransport(EXECUTOR);
         ITransportRegistry transportRegistry = new TransportRegistryImpl(aListener, serverTransport);
 
         serverListener        = aListener;
-        unaryServlet          = new UnaryHandler(aListener, serverTransport);
+        unaryServlet          = new UnaryHandler(aListener, serverTransport, aOptions);
         upServletHandler      = new UpServletHandler(transportRegistry);
-        downServletHandler    = new DownServletHandler(transportRegistry);
+        downServletHandler    = new DownServletHandler(transportRegistry, aOptions);
         tapServletHandler     = new TapServletHandler(transportRegistry);
         cleanupRegistryThread = new CleanupRegistryThread(transportRegistry);
         cleanupRegistryThread.start();
