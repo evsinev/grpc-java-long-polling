@@ -6,6 +6,9 @@ import java.util.UUID;
 
 public class Uuids {
 
+    private Uuids() {
+    }
+
     public static String generateUuid() {
         return uuidToBase64(UUID.randomUUID());
     }

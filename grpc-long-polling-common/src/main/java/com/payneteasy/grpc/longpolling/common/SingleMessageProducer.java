@@ -27,9 +27,10 @@ public class SingleMessageProducer implements StreamListener.MessageProducer {
     @Nullable
     @Override
     public InputStream next() {
-        LOG.trace("{}: next() [message = {}]", messageSource
-                , message != null ? ("size=" + size + "," + message) : "no message"
-        );
+        if(LOG.isTraceEnabled()) {
+            String messageInfo = message != null ? ("size=" + size + "," + message) : "no message";
+            LOG.trace("{}: next() [message = {}]", messageSource, messageInfo);
+        }
         InputStream messageToReturn = message;
         message = null;
         return messageToReturn;

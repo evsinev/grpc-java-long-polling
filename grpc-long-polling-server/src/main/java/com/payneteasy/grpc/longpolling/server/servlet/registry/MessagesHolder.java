@@ -63,6 +63,6 @@ public class MessagesHolder {
     }
 
     public boolean isActive() {
-        return state == State.ACTIVE || messages.size() > 0;
+        return state == State.ACTIVE || !messages.isEmpty();
     }
 }

@@ -13,7 +13,7 @@ public class SlotSender<T> {
     private final    Logger                      logger;
 
     public boolean hasSlots() {
-        return slots.size() > 0;
+        return !slots.isEmpty();
     }
 
     public interface SendFunction<T> {

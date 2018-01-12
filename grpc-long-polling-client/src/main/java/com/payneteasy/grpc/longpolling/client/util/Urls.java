@@ -5,6 +5,9 @@ import java.net.URL;
 
 public class Urls {
 
+    private Urls() {
+    }
+    
     public static URL appendPaths(URL aUrl, Object ... args) {
         StringBuilder sb = new StringBuilder();
         sb.append(aUrl);

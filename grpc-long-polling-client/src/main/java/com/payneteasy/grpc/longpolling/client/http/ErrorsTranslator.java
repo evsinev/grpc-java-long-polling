@@ -41,7 +41,7 @@ public class ErrorsTranslator {
     }
 
     public void abort(HttpStatus status) {
-        log.error("Abort on " + status + " for {}", url);
+        log.error("Abort on {} for {}", status, url);
         listener.closed(Status.ABORTED, new Metadata());
 
     }

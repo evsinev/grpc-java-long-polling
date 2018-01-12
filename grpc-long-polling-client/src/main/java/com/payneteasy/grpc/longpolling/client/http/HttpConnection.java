@@ -26,10 +26,6 @@ public class HttpConnection {
         aOptions.configure(connection);
     }
 
-//    public void fireMessageAvailable(ClientStreamListener aListener) throws IOException {
-//        new Streams(log).messageAvailable(aListener, connection);
-//    }
-
     public MessagesContainer readMessagesContainer() throws IOException {
         log.debug("Reading for output from server ...");
         return MessagesContainer.parse(connection.getInputStream());
