@@ -15,6 +15,7 @@ public class HelloWorldClientExample {
     private static final Logger LOG = LoggerFactory.getLogger(HelloWorldClientExample.class);
 
     public static void main(String[] args) {
+        LOG.error("test {}", new Exception());
         ManagedChannel channel = LongPollingChannelBuilder.forTarget("http://localhost:9095/test").build();
         GreeterGrpc.GreeterBlockingStub service = GreeterGrpc
                 .newBlockingStub(channel)

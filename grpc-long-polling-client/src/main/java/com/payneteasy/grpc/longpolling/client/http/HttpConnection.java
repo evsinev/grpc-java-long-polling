@@ -49,7 +49,9 @@ public class HttpConnection {
             ((Drainable) aInputStream).drainTo(out);
         } else {
             byte[] outputBytes = IoUtils.toByteArray(aInputStream);
-            log.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
+            if(log.isDebugEnabled()) {
+                log.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
+            }
             out.write(outputBytes);
         }
         return new HttpStatus(connection.getResponseCode(), connection.getResponseMessage());

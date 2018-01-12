@@ -59,7 +59,7 @@ public class LongPollingDispatcherServlet extends HttpServlet {
         try {
             call = MethodCall.parse(aRequest.getPathInfo());
         } catch (Exception e) {
-            LOG.error("Error while parsing " + aRequest.getRequestURL(), e);
+            LOG.error("Error while parsing {}", aRequest.getRequestURL(), e);
             aResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
             return;
         }
@@ -68,11 +68,11 @@ public class LongPollingDispatcherServlet extends HttpServlet {
         try {
             dispatch(aRequest, aResponse, call);
         } catch (InterruptedException e) {
-            LOG.error("Interrupted while processing " + call, e);
+            LOG.error("Interrupted while processing {}", call, e);
             aResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             Thread.currentThread().interrupt();
         } catch (Exception e) {
-            LOG.error("Error while processing " + call, e);
+            LOG.error("Error while processing {}", call, e);
             aResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

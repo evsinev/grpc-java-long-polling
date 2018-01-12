@@ -60,7 +60,7 @@ public class HttpClientUnary implements IHttpClient {
     }
 
     private void fireError(Status aStatus, Exception aException, String aReason) {
-        LOG.error(aReason + " " + sendUrl, aException);
+        LOG.error("{} {}", aReason, sendUrl, aException);
         if(listener != null) {
             listener.closed(aStatus, new Metadata());
         }

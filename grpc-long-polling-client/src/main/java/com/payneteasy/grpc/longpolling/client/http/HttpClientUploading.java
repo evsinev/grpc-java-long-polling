@@ -71,12 +71,14 @@ public class HttpClientUploading implements IHttpClient {
     private void readOutputFromServer(HttpURLConnection connection) throws IOException {
         try(InputStream in = connection.getInputStream()) {
             byte[] bytes = IoUtils.toByteArray(in);
-            LOG.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
+            if(LOG.isDebugEnabled()) {
+                LOG.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
+            }
         }
     }
 
     private void fireError(Status aStatus, Exception aException, String aReason) {
-        LOG.error(aReason + " " + sendUrl, aException);
+        LOG.error("{} {}", aReason, sendUrl, aException);
         if(listener != null) {
             listener.closed(aStatus, new Metadata());
         }

@@ -32,7 +32,9 @@ public class Streams {
             ((Drainable) aInputStream).drainTo(aOut);
         } else {
             byte[] outputBytes = IoUtils.toByteArray(aInputStream);
-            log.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
+            if(log.isDebugEnabled()) {
+                log.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
+            }
             aOut.write(outputBytes);
         }
     }
@@ -44,7 +46,9 @@ public class Streams {
     public void messageAvailable(ClientStreamListener aListener, InputStream aInputStream) throws IOException {
         try(InputStream in = aInputStream) {
             byte[] bytes = IoUtils.toByteArray(in);
-            log.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
+            if(log.isDebugEnabled()) {
+                log.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
+            }
             aListener.messagesAvailable(new SingleMessageProducer(getClass().getSimpleName(), bytes));
         }
 

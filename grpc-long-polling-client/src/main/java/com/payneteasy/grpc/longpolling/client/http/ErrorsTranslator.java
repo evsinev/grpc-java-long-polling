@@ -47,7 +47,7 @@ public class ErrorsTranslator {
     }
 
     private void fireError(Status aStatus, Exception aException, String aReason) {
-        log.error(aReason + " " + url, aException);
+        log.error("{} {}", aReason, url, aException);
         if(listener != null) {
             listener.closed(aStatus, new Metadata());
         }
