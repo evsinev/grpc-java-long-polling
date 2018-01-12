@@ -8,7 +8,7 @@ cache:
   directories:
   - $HOME/.m2
 
-script: "mvn test && mvn jacoco:report"
+script: "mvn -P integration-test test && mvn jacoco:report"
 
 before_install:
   - test -f $HOME/.m2/codacy-coverage-reporter-2.0.2.jar || wget -O $HOME/.m2/codacy-coverage-reporter-2.0.2.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/2.0.2/codacy-coverage-reporter-2.0.2-assembly.jar
