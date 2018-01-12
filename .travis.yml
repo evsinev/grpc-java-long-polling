@@ -18,3 +18,4 @@ after_success:
   - java -cp $HOME/.m2/codacy-coverage-reporter-2.0.2.jar com.codacy.CodacyCoverageReporter -l Java -r grpc-long-polling-common/target/site/jacoco/jacoco.xml
   - java -cp $HOME/.m2/codacy-coverage-reporter-2.0.2.jar com.codacy.CodacyCoverageReporter -l Java -r grpc-long-polling-client/target/site/jacoco/jacoco.xml
   - java -cp $HOME/.m2/codacy-coverage-reporter-2.0.2.jar com.codacy.CodacyCoverageReporter -l Java -r grpc-long-polling-server/target/site/jacoco/jacoco.xml
+  - mvn sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=evsinev-github -Dsonar.login=$SECURE_TOKEN

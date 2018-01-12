@@ -31,6 +31,12 @@
 
         <jacoco.basedir>${project.basedir}/../target/coverage</jacoco.basedir>
         
+        <jacoco.version>0.8.0</jacoco.version>
+        
+        <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
+        <sonar.language>java</sonar.language>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        
     </properties>
 
     <scm>
@@ -249,32 +255,22 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.0</version>
+                <version>${jacoco.version}</version>
                 <configuration>
-                    <dataFile>${jacoco.basedir}/jacoco.exec</dataFile>
-                    <destFile>${jacoco.basedir}/jacoco.exec</destFile>
+                    <destFile>${sonar.jacoco.reportPaths}</destFile>
+                    <dataFile>${sonar.jacoco.reportPaths}</dataFile>
                     <append>true</append>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>default-prepare-agent</id>
+                        <id>agent-for-ut</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>default-report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
-
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
