@@ -4,7 +4,7 @@
 
     <artifactId>grpc-long-polling</artifactId>
     <groupId>com.payneteasy</groupId>
-    <version>1.0-7-SNAPSHOT</version>
+    <version>1.0-7</version>
 
     <name>gRPC long polling ${project.version}</name>
 
@@ -43,7 +43,7 @@
         <connection>scm:git:git@github.com:evsinev/grpc-java-long-polling.git</connection>
         <developerConnection>scm:git:git@github.com:evsinev/grpc-java-long-polling.git</developerConnection>
         <url>https://github.com/evsinev/grpc-java-long-polling.git</url>
-        <tag>HEAD</tag>
+        <tag>grpc-long-polling-1.0-7</tag>
   </scm>
 
     <!--
