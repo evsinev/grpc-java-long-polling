@@ -70,4 +70,10 @@ public class LongPollingChannelBuilder extends AbstractManagedChannelImplBuilder
         return this;
     }
 
+    @Override
+    public LongPollingChannelBuilder usePlaintext() {
+        LOG.trace("usePlaintext ()");
+        return this;
+    }
+
 }
