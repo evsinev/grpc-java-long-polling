@@ -1,7 +1,7 @@
 package com.payneteasy.grpc.longpolling.common;
 
-import io.grpc.internal.IoUtils;
 import io.grpc.internal.StreamListener;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class SingleMessageProducer implements StreamListener.MessageProducer {
     }
 
     public static SingleMessageProducer readFully(Class<?> aClass, InputStream aInputStream) throws IOException {
-        byte[] buffer = IoUtils.toByteArray(aInputStream);
+        byte[] buffer = IOUtils.toByteArray(aInputStream);
         return new SingleMessageProducer(aClass.getSimpleName(), buffer);
     }
 }

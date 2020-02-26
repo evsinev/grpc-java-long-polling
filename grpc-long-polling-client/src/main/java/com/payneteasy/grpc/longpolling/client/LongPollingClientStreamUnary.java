@@ -4,12 +4,15 @@ import com.payneteasy.grpc.longpolling.client.http.HttpClientDelayedInit;
 import com.payneteasy.grpc.longpolling.client.http.HttpClientExecutor;
 import com.payneteasy.grpc.longpolling.client.http.HttpClientUnary;
 import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
+import io.grpc.Deadline;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
+import io.grpc.internal.InsightBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 
@@ -53,4 +56,11 @@ public class LongPollingClientStreamUnary extends AbstractClientStream {
         listener.onReady();
     }
 
+    @Override
+    public void setDeadline(@Nonnull Deadline deadline) {
+    }
+
+    @Override
+    public void appendTimeoutInsight(InsightBuilder insight) {
+    }
 }

@@ -54,7 +54,7 @@ public class StreamingClientTest {
 
             ManagedChannel channel = LongPollingChannelBuilder
                     .forTarget("http://localhost:9096/test")
-                    .usePlaintext(true)
+                    .usePlaintext()
                     .build();
 
             StreamingGreeterGrpc.StreamingGreeterStub stub = StreamingGreeterGrpc.newStub(channel);

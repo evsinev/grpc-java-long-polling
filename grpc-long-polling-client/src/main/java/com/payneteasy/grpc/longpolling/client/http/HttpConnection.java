@@ -4,7 +4,7 @@ import com.payneteasy.grpc.longpolling.client.util.ConnectionOptions;
 import com.payneteasy.grpc.longpolling.common.MessagesContainer;
 import com.payneteasy.tlv.HexUtil;
 import io.grpc.Drainable;
-import io.grpc.internal.IoUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class HttpConnection {
         if(aInputStream instanceof Drainable && !log.isDebugEnabled()) {
             ((Drainable) aInputStream).drainTo(out);
         } else {
-            byte[] outputBytes = IoUtils.toByteArray(aInputStream);
+            byte[] outputBytes = IOUtils.toByteArray(aInputStream);
             if(log.isDebugEnabled()) {
                 log.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
             }

@@ -1,5 +1,6 @@
 package com.payneteasy.grpc.longpolling.client;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.payneteasy.grpc.longpolling.client.util.ConnectionOptions;
 import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
@@ -7,22 +8,19 @@ import com.payneteasy.grpc.longpolling.common.TransportId;
 import io.grpc.*;
 import io.grpc.internal.ClientStream;
 import io.grpc.internal.ConnectionClientTransport;
-import io.grpc.internal.LogId;
-import io.grpc.internal.TransportTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LongPollingClientTransport implements ConnectionClientTransport {
 
     private static final Logger LOG = LoggerFactory.getLogger(LongPollingClientTransport.class);
 
-    private final LogId logId = LogId.allocate(getClass().getName());
+    private final InternalLogId logId = InternalLogId.allocate(getClass(), "");
 
     private final TransportId transportId;
     private final ConnectionOptions connectionFactory;
@@ -88,15 +86,15 @@ public class LongPollingClientTransport implements ConnectionClientTransport {
     }
 
     @Override
-    public Future<TransportTracer.Stats> getTransportStats() {
+    public ListenableFuture<InternalChannelz.SocketStats> getStats() {
         LOG.trace("getTransportStats()");
-        SettableFuture<TransportTracer.Stats> ret = SettableFuture.create();
+        SettableFuture<InternalChannelz.SocketStats> ret = SettableFuture.create();
         ret.set(null);
         return ret;
     }
 
     @Override
-    public LogId getLogId() {
+    public InternalLogId getLogId() {
         return logId;
     }
 }

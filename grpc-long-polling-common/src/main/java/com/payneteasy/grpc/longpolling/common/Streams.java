@@ -3,7 +3,7 @@ package com.payneteasy.grpc.longpolling.common;
 import com.payneteasy.tlv.HexUtil;
 import io.grpc.Drainable;
 import io.grpc.internal.ClientStreamListener;
-import io.grpc.internal.IoUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class Streams {
         if(aInputStream instanceof Drainable && !log.isDebugEnabled()) {
             ((Drainable) aInputStream).drainTo(aOut);
         } else {
-            byte[] outputBytes = IoUtils.toByteArray(aInputStream);
+            byte[] outputBytes = IOUtils.toByteArray(aInputStream);
             if(log.isDebugEnabled()) {
                 log.debug("OUTPUT: {}", HexUtil.toFormattedHexString(outputBytes));
             }
@@ -45,7 +45,7 @@ public class Streams {
 
     public void messageAvailable(ClientStreamListener aListener, InputStream aInputStream) throws IOException {
         try(InputStream in = aInputStream) {
-            byte[] bytes = IoUtils.toByteArray(in);
+            byte[] bytes = IOUtils.toByteArray(in);
             if(log.isDebugEnabled()) {
                 log.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
             }

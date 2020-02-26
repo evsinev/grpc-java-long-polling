@@ -6,7 +6,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.examples.serverstreaming.ServerStreamingGreeterGrpc;
 import io.grpc.examples.serverstreaming.TapHelloReply;
 import io.grpc.examples.serverstreaming.TapHelloRequest;
-import io.grpc.internal.IoUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class ServerStreamingClientTest {
             @Override
             protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
                 LOG.debug("URL {} ", req.getRequestURI());
-                byte[] bytes = IoUtils.toByteArray(req.getInputStream());
+                byte[] bytes = IOUtils.toByteArray(req.getInputStream());
                 requestHex.set(HexUtil.toFormattedHexString(bytes));
 
                 byte[] output = HexUtil.parseHex("01 0a06 7465 7374 2031");
