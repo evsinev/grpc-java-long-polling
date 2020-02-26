@@ -60,12 +60,6 @@ public class LongPollingChannelBuilder extends AbstractManagedChannelImplBuilder
         return new LongPollingClientTransportFactory(EXECUTOR, TransportId.generateNew(), new ConnectionOptions(baseUrl, connectionTimeout, readTimeout));
     }
 
-    @Override
-    public LongPollingChannelBuilder usePlaintext(boolean skipNegotiation) {
-        LOG.trace("usePlaintext ({})", skipNegotiation);
-        return this;
-    }
-
     public LongPollingChannelBuilder setConnectionTimeout(int aConnectionTimeout) {
         connectionTimeout = aConnectionTimeout;
         return this;
@@ -73,6 +67,12 @@ public class LongPollingChannelBuilder extends AbstractManagedChannelImplBuilder
 
     public LongPollingChannelBuilder setReadTimeout(int aReadTimeout) {
         readTimeout = aReadTimeout;
+        return this;
+    }
+
+    @Override
+    public LongPollingChannelBuilder usePlaintext() {
+        LOG.trace("usePlaintext ()");
         return this;
     }
 

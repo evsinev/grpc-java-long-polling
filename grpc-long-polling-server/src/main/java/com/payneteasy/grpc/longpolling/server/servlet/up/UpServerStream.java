@@ -79,4 +79,8 @@ public class UpServerStream extends AbstractNoopServerStream {
         messages.addMessage(aMessage);
     }
 
+    @Override
+    public int streamId() {
+        return -1;
+    }
 }

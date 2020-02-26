@@ -7,12 +7,15 @@ import com.payneteasy.grpc.longpolling.client.http.HttpClientUploading;
 import com.payneteasy.grpc.longpolling.client.util.ServerEndPoint;
 import com.payneteasy.grpc.longpolling.common.SingleMessageProducer;
 import com.payneteasy.grpc.longpolling.common.SlotSender;
+import io.grpc.Deadline;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
+import io.grpc.internal.InsightBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -69,4 +72,11 @@ public class LongPollingClientStreamBidi extends AbstractClientStream {
         downloading.sendMessage(null);
     }
 
+    @Override
+    public void setDeadline(@Nonnull Deadline deadline) {
+    }
+
+    @Override
+    public void appendTimeoutInsight(InsightBuilder insight) {
+    }
 }

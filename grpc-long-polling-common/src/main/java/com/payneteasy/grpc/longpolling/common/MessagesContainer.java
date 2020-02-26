@@ -1,6 +1,6 @@
 package com.payneteasy.grpc.longpolling.common;
 
-import io.grpc.internal.IoUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -29,11 +29,11 @@ public final class MessagesContainer {
     public void writeToOutput(OutputStream aOut) throws IOException {
         if(inputs.size() == 1) {
             aOut.write(0x01); // version
-            IoUtils.copy(inputs.get(0), aOut);
+            IOUtils.copy(inputs.get(0), aOut);
         } else {
             aOut.write(0x02); // version
             for (InputStream input : inputs) {
-                byte[] buf = IoUtils.toByteArray(input);
+                byte[] buf = IOUtils.toByteArray(input);
                 aOut.write(getLengthBytes(buf.length));
                 aOut.write(buf);
             }
@@ -103,7 +103,7 @@ public final class MessagesContainer {
         private final List<InputStream> inputs = new ArrayList<>();
 
         public Builder add(InputStream aInputStream) throws IOException {
-            byte[] buf = IoUtils.toByteArray(aInputStream);
+            byte[] buf = IOUtils.toByteArray(aInputStream);
             return add(buf);
         }
 

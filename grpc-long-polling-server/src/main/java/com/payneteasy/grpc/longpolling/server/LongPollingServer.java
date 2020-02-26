@@ -1,11 +1,15 @@
 package com.payneteasy.grpc.longpolling.server;
 
+import io.grpc.InternalChannelz;
+import io.grpc.InternalInstrumented;
 import io.grpc.internal.InternalServer;
 import io.grpc.internal.ServerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
+import java.net.SocketAddress;
 
 public class LongPollingServer implements InternalServer {
 
@@ -24,13 +28,19 @@ public class LongPollingServer implements InternalServer {
         LOG.trace("shutdown()");
     }
 
-    @Override
-    public int getPort() {
-        LOG.trace("getPort()");
-        return -1;
-    }
-
     public ServerListener waitForServerListener() {
         return listener;
     }
+
+    @Override
+    public SocketAddress getListenSocketAddress() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public InternalInstrumented<InternalChannelz.SocketStats> getListenSocketStats() {
+        return null;
+    }
+
 }

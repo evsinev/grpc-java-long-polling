@@ -5,8 +5,8 @@ import com.payneteasy.grpc.longpolling.server.servlet.LongPollingDispatcherServl
 import com.payneteasy.grpc.longpolling.test.util.ServerUtils;
 import com.payneteasy.grpc.longpolling.test.util.SimpleJettyServer;
 import com.payneteasy.tlv.HexUtil;
-import io.grpc.internal.IoUtils;
 import io.grpc.internal.ServerListener;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -96,7 +96,7 @@ public class StreamingServerTest {
         connection.setDoInput(true);
         connection.setDoOutput(true);
         connection.getOutputStream().write(HexUtil.parseHex(aHex));
-        byte[] out =  IoUtils.toByteArray(connection.getInputStream());
+        byte[] out = IOUtils.toByteArray(connection.getInputStream());
         String hex = HexUtil.toFormattedHexString(out);
         LOG.debug("out: {}", hex);
         return hex;

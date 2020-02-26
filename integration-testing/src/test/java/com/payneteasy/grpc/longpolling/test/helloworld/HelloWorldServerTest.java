@@ -5,8 +5,8 @@ import com.payneteasy.grpc.longpolling.server.servlet.LongPollingDispatcherServl
 import com.payneteasy.grpc.longpolling.test.util.ServerUtils;
 import com.payneteasy.grpc.longpolling.test.util.SimpleJettyServer;
 import com.payneteasy.tlv.HexUtil;
-import io.grpc.internal.IoUtils;
 import io.grpc.internal.ServerListener;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -42,6 +42,6 @@ public class HelloWorldServerTest {
         connection.setDoInput(true);
         connection.setDoOutput(true);
         connection.getOutputStream().write(HexUtil.parseHex("0A 05 68 65  6C 6C 6F"));
-        return IoUtils.toByteArray(connection.getInputStream());
+        return IOUtils.toByteArray(connection.getInputStream());
     }
 }

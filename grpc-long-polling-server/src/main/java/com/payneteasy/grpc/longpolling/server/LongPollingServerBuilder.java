@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 public class LongPollingServerBuilder extends AbstractServerImplBuilder<LongPollingServerBuilder> {
@@ -17,9 +18,9 @@ public class LongPollingServerBuilder extends AbstractServerImplBuilder<LongPoll
 
 
     @Override
-    protected InternalServer buildTransportServer(List<ServerStreamTracer.Factory> aFactory) {
-        LOG.trace("buildTransportServer({})", aFactory);
-        return pollingServer;
+    protected List<? extends InternalServer> buildTransportServers(List<? extends ServerStreamTracer.Factory> streamTracerFactories) {
+        LOG.trace("buildTransportServers({})", streamTracerFactories);
+        return Collections.singletonList(pollingServer);
     }
 
     public LongPollingServerBuilder longPollingServer(LongPollingServer aPollingServer) {

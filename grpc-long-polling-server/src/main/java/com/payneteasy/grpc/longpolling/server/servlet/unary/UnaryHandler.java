@@ -5,9 +5,9 @@ import com.payneteasy.grpc.longpolling.server.servlet.MethodCall;
 import com.payneteasy.grpc.longpolling.server.servlet.ServletOptions;
 import io.grpc.Attributes;
 import io.grpc.Metadata;
-import io.grpc.internal.IoUtils;
 import io.grpc.internal.ServerListener;
 import io.grpc.internal.ServerTransportListener;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class UnaryHandler {
         LOG.debug("Creating unary transport and stream: {}", aMethod.getStreamId());
         ServerTransportListener listener = serverListener.transportCreated(serverTransport);
 
-        byte[] buffer = IoUtils.toByteArray(aRequest.getInputStream());
+        byte[] buffer = IOUtils.toByteArray(aRequest.getInputStream());
         UnaryServerStream stream = new UnaryServerStream(buffer, aResponse, aMethod.getStreamId());
         listener.streamCreated(stream, aMethod.getMethod(), new Metadata());
         listener.transportReady(Attributes.EMPTY);

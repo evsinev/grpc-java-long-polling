@@ -7,7 +7,7 @@ import com.payneteasy.tlv.HexUtil;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.internal.ClientStreamListener;
-import io.grpc.internal.IoUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,7 @@ public class HttpClientUploading implements IHttpClient {
 
     private void readOutputFromServer(HttpURLConnection connection) throws IOException {
         try(InputStream in = connection.getInputStream()) {
-            byte[] bytes = IoUtils.toByteArray(in);
+            byte[] bytes = IOUtils.toByteArray(in);
             if(LOG.isDebugEnabled()) {
                 LOG.debug("INPUT: {}", HexUtil.toFormattedHexString(bytes));
             }

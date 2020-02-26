@@ -5,7 +5,7 @@ import com.payneteasy.grpc.longpolling.common.StreamId;
 import com.payneteasy.grpc.longpolling.server.base.AbstractNoopServerStream;
 import io.grpc.Metadata;
 import io.grpc.Status;
-import io.grpc.internal.IoUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class UnaryServerStream extends AbstractNoopServerStream {
     public void writeMessage(InputStream message) {
         LOG.trace("writeMessage({})", message);
         try {
-            IoUtils.copy(message, response.getOutputStream());
+            IOUtils.copy(message, response.getOutputStream());
         } catch (IOException e) {
             LOG.error("IO error", e);
             if(listener != null) {
@@ -76,5 +76,10 @@ public class UnaryServerStream extends AbstractNoopServerStream {
 
     public boolean waitDone(int aPeriod, TimeUnit aTimeUnit) throws InterruptedException {
         return latch.await(aPeriod, aTimeUnit);
+    }
+
+    @Override
+    public int streamId() {
+        return -1;
     }
 }

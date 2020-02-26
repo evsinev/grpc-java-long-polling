@@ -2,11 +2,14 @@ package com.payneteasy.grpc.longpolling.client;
 
 import com.payneteasy.grpc.longpolling.client.util.ConnectionOptions;
 import com.payneteasy.grpc.longpolling.common.TransportId;
-import io.grpc.internal.*;
+import io.grpc.ChannelLogger;
+import io.grpc.internal.ClientTransportFactory;
+import io.grpc.internal.ConnectionClientTransport;
+import io.grpc.internal.GrpcUtil;
+import io.grpc.internal.SharedResourceHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.net.SocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -29,8 +32,8 @@ public class LongPollingClientTransportFactory implements ClientTransportFactory
     }
 
     @Override
-    public ConnectionClientTransport newClientTransport(SocketAddress aAddress, String authority, @Nullable String userAgent, @Nullable ProxyParameters proxy) {
-        LOG.trace("newClientTransport(address={}, authority:{}, userAgent:{}, proxy:{})", aAddress, authority, userAgent, proxy);
+    public ConnectionClientTransport newClientTransport(SocketAddress serverAddress, ClientTransportOptions options, ChannelLogger channelLogger) {
+        LOG.trace("newClientTransport(address={}, options:{})", serverAddress, options);
         return new LongPollingClientTransport(executorService, connectionOptions, transportId);
     }
 
